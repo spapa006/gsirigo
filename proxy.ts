@@ -33,5 +33,9 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/((?!api|trpc|go|_next|_vercel|.*\\..*).*)',
+  // Static root files (ads.txt, sitemap.xml, robots.txt) are excluded so the
+  // next-intl proxy never locale-prefixes them — they must stay at the site
+  // root. /go (route handler) and /api, /trpc, /_next, /_vercel are excluded
+  // too; anything containing a dot (assets like /.well-known/…) is skipped.
+  matcher: '/((?!api|trpc|go|ads\\.txt|sitemap\\.xml|robots\\.txt|_next|_vercel|.*\\..*).*)',
 };
