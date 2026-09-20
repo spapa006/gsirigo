@@ -1,13 +1,13 @@
 import { getTranslations } from 'next-intl/server';
 import { ArrowRight } from 'lucide-react';
-import { getAllArticles } from '@/lib/content';
+import { getAllArticles } from '@/lib/db/repositories/articles';
 import { Link } from '@/i18n/navigation';
 import { ArticleCard } from '@/components/article-card';
 import { buttonVariants } from '@/components/ui/button';
 
 export async function LatestArticles({ locale }: { locale: string }) {
   const t = await getTranslations({ locale, namespace: 'LatestArticles' });
-  const articles = getAllArticles(locale).slice(0, 4);
+  const articles = (await getAllArticles(locale)).slice(0, 4);
 
   if (articles.length === 0) return null;
 
@@ -31,7 +31,7 @@ export async function LatestArticles({ locale }: { locale: string }) {
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {articles.map((article) => (
-          <ArticleCard key={article.slug} article={article} locale={locale} />
+          <ArticleCard key={article.slug} article={article} />
         ))}
       </div>
     </section>

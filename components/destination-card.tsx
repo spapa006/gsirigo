@@ -2,16 +2,16 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import type { Destination, DestinationLocalized } from '@/lib/destinations';
 import { Link } from '@/i18n/navigation';
-import { CarRentalWidget } from '@/components/car-rental-widget';
+import { WidgetHost } from '@/components/widget-host';
 import { Badge } from '@/components/ui/badge';
 
 type DestinationCardProps = {
-  destination: Destination;
+  destination: Pick<Destination, 'slug' | 'image'>;
   localized: DestinationLocalized;
   locale: string;
 };
 
-export function DestinationCard({
+export async function DestinationCard({
   destination,
   localized,
   locale,
@@ -42,8 +42,9 @@ export function DestinationCard({
       </Link>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
-        <CarRentalWidget
+        <WidgetHost
           variant="mini"
+          locale={locale}
           destination={localized.city}
           country={localized.country}
         />

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { destinations, getLocalizedDestination } from '@/lib/destinations';
+import { getAllDestinations } from '@/lib/db/repositories/destinations';
 import { localizedMetadata } from '@/lib/metadata';
 import { DestinationCard } from '@/components/destination-card';
 
@@ -27,14 +27,7 @@ export default async function DestinationsPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'DestinationsPage' });
 
-  const items = destinations
-    .slice()
-    .sort((a, b) => a.weight - b.weight)
-    .map((d) => {
-      const localized = getLocalizedDestination(d.slug, locale);
-      return localized ? { destination: d, localized: localized.localized } : null;
-    })
-    .filter((x): x is NonNullable<typeof x> => x !== null);
+  const items = await getAllDestinations(locale);
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -46,10 +39,10 @@ export default async function DestinationsPage({
       </header>
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map(({ destination, localized }) => (
+        {items.map(({ slug, image, localized }) => (
           <DestinationCard
-            key={destination.slug}
-            destination={destination}
+            key={slug}
+            destination={{ slug, image }}
             localized={localized}
             locale={locale}
           />

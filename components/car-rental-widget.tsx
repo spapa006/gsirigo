@@ -25,6 +25,13 @@ export type CarRentalWidgetProps = {
   country?: string;
   variant?: WidgetVariant;
   className?: string;
+  /** Real Travelpayouts embed snippet (loaded from the DB via WidgetHost) */
+  embed?: string;
+  /** Travelpayouts attribution overrides from partner/settings DB rows */
+  marker?: string;
+  subId?: string;
+  /** When set, the search button routes through /go/<slug> (cloaked link) */
+  redirectSlug?: string;
 };
 
 function toDateInputValue(date: Date) {
@@ -54,6 +61,10 @@ export function CarRentalWidget({
   country,
   variant = 'full',
   className,
+  embed,
+  marker,
+  subId,
+  redirectSlug,
 }: CarRentalWidgetProps) {
   const locale = useLocale();
   const t = useTranslations('Widget');
@@ -64,8 +75,8 @@ export function CarRentalWidget({
   const [checkOut, setCheckOut] = useState(() => toDateInputValue(addDays(10)));
   const [driverAge, setDriverAge] = useState('30');
 
-  // Real Travelpayouts embed takes over when configured in lib/partners.ts
-  if (config.embed) {
+  // Real Travelpayouts embed takes over when configured (DB row via WidgetHost).
+  if (embed) {
     return (
       <div
         className={cn(
@@ -74,17 +85,22 @@ export function CarRentalWidget({
         )}
         data-partner={partner}
         data-locale={locale}
-        dangerouslySetInnerHTML={{ __html: config.embed }}
+        dangerouslySetInnerHTML={{ __html: embed }}
       />
     );
   }
 
   function handleSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // Draft behavior: deep-open the partner site with attribution params.
-    // Automatically replaced once `embed` contains the real widget script.
+    // Cloaked affiliate link: /go/<slug> tracks the click and 302s to the
+    // real Travelpayouts URL (standard way outbound affiliate links are issued).
+    if (redirectSlug) {
+      window.open(`/go/${redirectSlug}`, '_blank', 'noopener');
+      return;
+    }
+    // Fallback: deep-open the partner site with attribution params.
     window.open(
-      getAffiliateLink(partner, pickup.trim() || undefined),
+      getAffiliateLink(partner, pickup.trim() || undefined, { marker, subId }),
       '_blank',
       'noopener'
     );

@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { BadgeCheck } from 'lucide-react';
-import { CarRentalWidget } from '@/components/car-rental-widget';
+import { WidgetHost } from '@/components/widget-host';
 import { Badge } from '@/components/ui/badge';
 
 export async function Hero({ locale }: { locale: string }) {
@@ -28,7 +28,7 @@ export async function Hero({ locale }: { locale: string }) {
 
         {/* The single most important conversion element */}
         <div className="mx-auto mt-10 max-w-2xl">
-          <CarRentalWidget />
+          <WidgetHost locale={locale} variant="full" />
         </div>
 
         <ul className="mx-auto mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">

@@ -1,12 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
-import {
-  getArticleSlugs,
-  getLegalSlugs,
-} from '@/lib/content';
-import { destinations } from '@/lib/destinations';
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://gsirigo.com';
+import { listArticleSlugs } from '@/lib/db/repositories/articles';
+import { listDestinationSlugs } from '@/lib/db/repositories/destinations';
+import { getLegalSlugs } from '@/lib/content';
+import { getSettings } from '@/lib/db/repositories/settings';
 
 const staticPaths = [
   '',
@@ -19,7 +16,10 @@ const staticPaths = [
   '/legal/terms',
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const settings = await getSettings();
+  const SITE_URL = settings.siteUrl;
+
   const entries: MetadataRoute.Sitemap = [];
 
   for (const locale of routing.locales) {
@@ -32,8 +32,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       });
     }
 
-    // Articles
-    for (const slug of getArticleSlugs(locale)) {
+    // Articles (published only, DB-driven)
+    for (const slug of await listArticleSlugs(locale)) {
       entries.push({
         url: `${SITE_URL}/${locale}/articles/${slug}`,
         lastModified: new Date(),
@@ -43,16 +43,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
 
     // Destinations
-    for (const destination of destinations) {
+    for (const slug of await listDestinationSlugs(locale)) {
       entries.push({
-        url: `${SITE_URL}/${locale}/destinations/${destination.slug}`,
+        url: `${SITE_URL}/${locale}/destinations/${slug}`,
         lastModified: new Date(),
         changeFrequency: 'monthly',
         priority: 0.7,
       });
     }
 
-    // Legal pages
+    // Legal pages (static MDX)
     for (const slug of getLegalSlugs(locale)) {
       entries.push({
         url: `${SITE_URL}/${locale}/legal/${slug}`,

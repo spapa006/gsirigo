@@ -19,7 +19,20 @@ const LEGAL_LINKS = [
   { href: '/legal/terms', key: 'terms' },
 ] as const;
 
-export async function SiteFooter({ locale }: { locale: Locale }) {
+export async function SiteFooter({
+  locale,
+  disclosure,
+  socialX,
+  socialInstagram,
+  socialFacebook,
+}: {
+  locale: Locale;
+  /** Display text override from the admin Settings table */
+  disclosure?: string;
+  socialX?: string;
+  socialInstagram?: string;
+  socialFacebook?: string;
+}) {
   const t = await getTranslations({ locale, namespace: 'Footer' });
   const headerT = await getTranslations({ locale, namespace: 'Header' });
 
@@ -97,7 +110,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
           </h3>
           <div className="flex gap-3">
             <a
-              href={siteConfig.social.x}
+              href={socialX ?? siteConfig.social.x}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="X / Twitter"
@@ -106,7 +119,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
               <Twitter className="h-4 w-4" />
             </a>
             <a
-              href={siteConfig.social.instagram}
+              href={socialInstagram ?? siteConfig.social.instagram}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -115,7 +128,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
               <Instagram className="h-4 w-4" />
             </a>
             <a
-              href={siteConfig.social.facebook}
+              href={socialFacebook ?? siteConfig.social.facebook}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
@@ -130,7 +143,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
       {/* Affiliate disclosure + copyright */}
       <div className="border-t border-slate-800">
         <div className="container-page space-y-3 py-6 text-center text-xs text-slate-500">
-          <p>{t('affiliateDisclosure')}</p>
+          <p>{disclosure ?? t('affiliateDisclosure')}</p>
           <p>
             © {new Date().getFullYear()} Gsirigo · {t('rights')}
           </p>

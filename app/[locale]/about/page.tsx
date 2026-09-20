@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { localizedMetadata } from '@/lib/metadata';
 import { JsonLd } from '@/components/json-ld';
-import { ContactForm } from '@/components/contact-form';
 import { siteUrl } from '@/lib/site';
 import { siteConfig } from '@/lib/site';
 

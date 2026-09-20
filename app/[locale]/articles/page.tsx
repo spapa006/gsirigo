@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { getAllArticles } from '@/lib/content';
+import { getAllArticles } from '@/lib/db/repositories/articles';
 import { localizedMetadata } from '@/lib/metadata';
 import { ArticleCard } from '@/components/article-card';
 
@@ -24,7 +24,7 @@ export async function generateMetadata({
 export default async function ArticlesPage({ params }: ArticlesPageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'ArticlesPage' });
-  const articles = getAllArticles(locale);
+  const articles = await getAllArticles(locale);
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -37,7 +37,7 @@ export default async function ArticlesPage({ params }: ArticlesPageProps) {
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {articles.map((article) => (
-          <ArticleCard key={article.slug} article={article} locale={locale} />
+          <ArticleCard key={article.slug} article={article} />
         ))}
       </div>
     </div>

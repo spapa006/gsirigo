@@ -4,6 +4,7 @@ import { Inter, Noto_Sans_Arabic } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { routing, isRtl } from '@/i18n/routing';
+import { getSettings } from '@/lib/db/repositories/settings';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { Analytics } from '@/components/analytics';
@@ -48,6 +49,7 @@ export default async function LocaleLayout({
   const locale = await getLocale();
   const messages = await getMessages();
   const dir = isRtl(locale) ? 'rtl' : 'ltr';
+  const settings = await getSettings();
 
   return (
     <html
@@ -61,9 +63,15 @@ export default async function LocaleLayout({
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
             <main className="flex-1">{children}</main>
-            <SiteFooter locale={locale as (typeof routing.locales)[number]} />
+            <SiteFooter
+              locale={locale as (typeof routing.locales)[number]}
+              disclosure={settings.affiliateDisclosure || undefined}
+              socialX={settings.socialX}
+              socialInstagram={settings.socialInstagram}
+              socialFacebook={settings.socialFacebook}
+            />
           </div>
-          <Analytics />
+          <Analytics gaId={settings.gaId || undefined} />
         </NextIntlClientProvider>
       </body>
     </html>

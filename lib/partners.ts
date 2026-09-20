@@ -65,13 +65,23 @@ export const PARTNER_LIST = Object.values(PARTNERS);
 
 /**
  * Builds a partner link with the Travelpayouts attribution marker / sub_id.
- * Verify the exact query parameter names in your dashboard before launch.
+ * `marker`/`subId` override the environment defaults (used by the admin
+ * partners & settings DB tables when present). Verify the exact query
+ * parameter names in your dashboard before launch.
  */
-export function getAffiliateLink(partnerId: PartnerId, city?: string): string {
+export function getAffiliateLink(
+  partnerId: PartnerId,
+  city?: string,
+  overrides?: { marker?: string | null; subId?: string | null }
+): string {
   const p = PARTNERS[partnerId];
   const url = new URL(p.baseUrl);
-  const marker = process.env.NEXT_PUBLIC_TRAVELPAYOUTS_MARKER?.trim();
-  const subId = process.env.NEXT_PUBLIC_TRAVELPAYOUTS_SUB_ID?.trim();
+  const marker =
+    overrides?.marker?.trim() ||
+    process.env.NEXT_PUBLIC_TRAVELPAYOUTS_MARKER?.trim();
+  const subId =
+    overrides?.subId?.trim() ||
+    process.env.NEXT_PUBLIC_TRAVELPAYOUTS_SUB_ID?.trim();
   if (marker) url.searchParams.set('aff', marker);
   if (subId) url.searchParams.set('sub_id', subId);
   if (city) url.searchParams.set('pickup', city);

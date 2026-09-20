@@ -3,12 +3,8 @@ import { notFound } from 'next/navigation';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import { getTranslations } from 'next-intl/server';
 import { CalendarDays, Clock, CornerUpLeft } from 'lucide-react';
-import {
-  getArticleMeta,
-  getArticleSource,
-  getArticleSlugs,
-} from '@/lib/content';
-import { getLocalizedDestination } from '@/lib/destinations';
+import { getArticle, listArticleSlugs } from '@/lib/db/repositories/articles';
+import { getManagedDestination } from '@/lib/db/repositories/destinations';
 import { localizedMetadata } from '@/lib/metadata';
 import { siteUrl } from '@/lib/site';
 import { routing } from '@/i18n/routing';
@@ -16,16 +12,16 @@ import { Link } from '@/i18n/navigation';
 import { mdxComponents } from '@/components/mdx-components';
 import { CtaBlock } from '@/components/cta-block';
 import { JsonLd } from '@/components/json-ld';
-import { CarRentalWidget } from '@/components/car-rental-widget';
+import { WidgetHost } from '@/components/widget-host';
 
 type ArticlePageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
   const params: { locale: string; slug: string }[] = [];
   for (const locale of routing.locales) {
-    for (const slug of getArticleSlugs(locale)) {
+    for (const slug of await listArticleSlugs(locale)) {
       params.push({ locale, slug });
     }
   }
@@ -36,27 +32,27 @@ export async function generateMetadata({
   params,
 }: ArticlePageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const meta = getArticleMeta(locale, slug);
-  if (!meta) return {};
+  const article = await getArticle(locale, slug);
+  if (!article) return {};
   return localizedMetadata({
     locale,
     path: `/articles/${slug}`,
-    title: meta.metaTitle || meta.title,
-    description: meta.metaDescription || meta.excerpt,
+    title: article.meta.metaTitle || article.meta.title,
+    description: article.meta.metaDescription || article.meta.excerpt,
   });
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { locale, slug } = await params;
-  const meta = getArticleMeta(locale, slug);
-  const source = getArticleSource(locale, slug);
-  if (!meta || !source) notFound();
+  const article = await getArticle(locale, slug);
+  if (!article) notFound();
 
   const { content } = await compileMDX({
-    source,
-    components: mdxComponents(),
+    source: article.body,
+    components: mdxComponents(locale),
   });
 
+  const { meta } = article;
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -81,8 +77,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   };
 
   const relatedDestination = meta.destination
-    ? getLocalizedDestination(meta.destination, locale)
+    ? await getManagedDestination(meta.destination, locale)
     : null;
+
+  const widgetCity = relatedDestination?.localized.city ?? meta.widget?.city;
+  const widgetCountry = relatedDestination?.localized.country ?? meta.widget?.country;
 
   const t = await getTranslations({ locale, namespace: 'ArticlePage' });
 
@@ -124,17 +123,22 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         </div>
       </article>
 
-      {relatedDestination && (
+      {(relatedDestination || widgetCity) && (
         <section className="container-page max-w-3xl pb-14">
-          <h2 className="text-lg font-bold">{t('relatedDestination')}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {relatedDestination.localized.tagline}
-          </p>
+          {relatedDestination && (
+            <>
+              <h2 className="text-lg font-bold">{t('relatedDestination')}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {relatedDestination.localized.tagline}
+              </p>
+            </>
+          )}
           <div className="mt-4">
-            <CarRentalWidget
+            <WidgetHost
               variant="mini"
-              destination={relatedDestination.localized.city}
-              country={relatedDestination.localized.country}
+              locale={locale}
+              destination={widgetCity}
+              country={widgetCountry}
             />
           </div>
         </section>

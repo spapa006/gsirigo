@@ -50,7 +50,7 @@ export default async function LegalPage({ params }: LegalPageProps) {
 
   const { content } = await compileMDX({
     source,
-    components: mdxComponents(),
+    components: mdxComponents(locale),
   });
 
   const t = await getTranslations({ locale, namespace: 'Legal' });

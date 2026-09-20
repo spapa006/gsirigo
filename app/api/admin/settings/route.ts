@@ -1,0 +1,28 @@
+import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/require-admin';
+import { saveSettings, SETTING_KEYS } from '@/lib/db/repositories/settings';
+import { revalidateSiteWide } from '@/lib/revalidate';
+
+export const runtime = 'nodejs';
+
+export async function POST(request: Request) {
+  const auth = await requireAdmin(request);
+  if (auth instanceof NextResponse) return auth;
+
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
+  }
+
+  const entries: Record<string, string> = {};
+  for (const key of SETTING_KEYS) {
+    const value = body[key];
+    if (typeof value === 'string') entries[key] = value;
+  }
+
+  await saveSettings(entries);
+  revalidateSiteWide();
+  return NextResponse.json({ ok: true });
+}

@@ -3,17 +3,15 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { Check, CornerUpLeft } from 'lucide-react';
-import { destinations, getLocalizedDestination } from '@/lib/destinations';
 import {
-  getAllArticles,
-} from '@/lib/content';
+  getManagedDestination,
+  listDestinationSlugs,
+} from '@/lib/db/repositories/destinations';
+import { getAllArticles } from '@/lib/db/repositories/articles';
 import { localizedMetadata } from '@/lib/metadata';
 import { routing } from '@/i18n/routing';
 import { Link } from '@/i18n/navigation';
-import {
-  CarRentalWidget,
-  type CarRentalWidgetProps,
-} from '@/components/car-rental-widget';
+import { WidgetHost } from '@/components/widget-host';
 import { CtaBlock } from '@/components/cta-block';
 import { Badge } from '@/components/ui/badge';
 import { ArticleCard } from '@/components/article-card';
@@ -22,11 +20,11 @@ type DestinationPageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
   const params: { locale: string; slug: string }[] = [];
   for (const locale of routing.locales) {
-    for (const destination of destinations) {
-      params.push({ locale, slug: destination.slug });
+    for (const slug of await listDestinationSlugs(locale)) {
+      params.push({ locale, slug });
     }
   }
   return params;
@@ -36,7 +34,7 @@ export async function generateMetadata({
   params,
 }: DestinationPageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const data = getLocalizedDestination(slug, locale);
+  const data = await getManagedDestination(slug, locale);
   if (!data) return {};
   const { localized } = data;
   const t = await getTranslations({ locale, namespace: 'DestinationPage' });
@@ -53,12 +51,13 @@ export async function generateMetadata({
 
 export default async function DestinationPage({ params }: DestinationPageProps) {
   const { locale, slug } = await params;
-  const data = getLocalizedDestination(slug, locale);
+  const data = await getManagedDestination(slug, locale);
   if (!data) notFound();
   const { localized } = data;
   const t = await getTranslations({ locale, namespace: 'DestinationPage' });
 
-  const relatedArticles = getAllArticles(locale)
+  const allArticles = await getAllArticles(locale);
+  const relatedArticles = allArticles
     .filter((a) => a.meta.destination === slug)
     .slice(0, 3);
 
@@ -121,10 +120,9 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
 
                 {/* Pre-filled search widget for this destination */}
                 <div id="widget" className="scroll-mt-32">
-                  <CarRentalWidget
-                    partner={
-                      'rentalcars' as CarRentalWidgetProps['partner']
-                    }
+                  <WidgetHost
+                    locale={locale}
+                    partner="rentalcars"
                     destination={localized.city}
                     country={localized.country}
                     variant="full"
@@ -143,11 +141,7 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
             </h2>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {relatedArticles.map((article) => (
-                <ArticleCard
-                  key={article.slug}
-                  article={article}
-                  locale={locale}
-                />
+                <ArticleCard key={article.slug} article={article} />
               ))}
             </div>
           </section>

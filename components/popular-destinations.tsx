@@ -1,18 +1,11 @@
 import { getTranslations } from 'next-intl/server';
-import { destinations, getLocalizedDestination } from '@/lib/destinations';
+import { getAllDestinations } from '@/lib/db/repositories/destinations';
 import { DestinationCard } from '@/components/destination-card';
 
 export async function PopularDestinations({ locale }: { locale: string }) {
   const t = await getTranslations({ locale, namespace: 'Destinations' });
 
-  const items = destinations
-    .slice()
-    .sort((a, b) => a.weight - b.weight)
-    .map((d) => {
-      const localized = getLocalizedDestination(d.slug, locale);
-      return localized ? { destination: d, localized: localized.localized } : null;
-    })
-    .filter((x): x is NonNullable<typeof x> => x !== null);
+  const items = await getAllDestinations(locale);
 
   return (
     <section className="bg-slate-50/60 py-16 lg:py-20">
@@ -25,10 +18,10 @@ export async function PopularDestinations({ locale }: { locale: string }) {
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map(({ destination, localized }) => (
+          {items.map(({ slug, image, localized }) => (
             <DestinationCard
-              key={destination.slug}
-              destination={destination}
+              key={slug}
+              destination={{ slug, image }}
               localized={localized}
               locale={locale}
             />

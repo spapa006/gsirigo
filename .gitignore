@@ -20,7 +20,11 @@ yarn-error.log*
 
 # env files
 .env
-.env*.local
+.env.*
+!.env.example
+
+# local sqlite (libsql) database file created on first boot
+/data/
 
 # vercel
 .vercel

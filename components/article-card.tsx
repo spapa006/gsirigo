@@ -5,10 +5,9 @@ import type { Article } from '@/lib/content';
 
 type ArticleCardProps = {
   article: Article;
-  locale: string;
 };
 
-export function ArticleCard({ article, locale }: ArticleCardProps) {
+export function ArticleCard({ article }: ArticleCardProps) {
   const { meta } = article;
 
   return (
