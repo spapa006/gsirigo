@@ -1,0 +1,140 @@
+{
+  "Meta": {
+    "brand": "Gsirigo",
+    "title": "Compara y reserva alquileres de coche baratos en todo el mundo | Gsirigo",
+    "description": "Compara al instante ofertas de alquiler de coche de socios de confianza — Rentalcars, AutoEurope, EconomyBookings. Sin comisiones ocultas, cancelación gratuita en la mayoría de reservas y mejor precio garantizado."
+  },
+  "Common": {
+    "ctaTitle": "¿Listo para comparar precios de alquiler de coche?",
+    "ctaDescription": "Haz una sola búsqueda y compara ofertas de varias marcas de alquiler de confianza. Serás redirigido a la web del socio para completar tu reserva de forma segura.",
+    "ctaButton": "Comparar precios ahora",
+    "updated": "Última actualización"
+  },
+  "Header": {
+    "disclosure": "Nuestras ofertas se muestran mediante widgets de búsqueda proporcionados por nuestros socios de confianza. Tras buscar y seleccionar una oferta, serás redirigido a la web del socio para completar tu reserva de forma segura.",
+    "nav": {
+      "home": "Inicio",
+      "articles": "Artículos",
+      "destinations": "Destinos",
+      "about": "Sobre nosotros",
+      "contact": "Contacto"
+    },
+    "language": "Idioma",
+    "menu": "Menú",
+    "close": "Cerrar",
+    "trustRow": "Buscar con:"
+  },
+  "Footer": {
+    "tagline": "Gsirigo compara ofertas de alquiler de coche de socios de confianza de todo el mundo para que encuentres el coche adecuado al mejor precio en minutos.",
+    "partnerNote": "Las reservas se buscan, se cotizan y se completan en las webs de nuestros socios. Gsirigo nunca gestiona tu reserva ni tu pago directamente.",
+    "quickLinks": "Enlaces rápidos",
+    "partners": "Socios",
+    "legal": "Legal",
+    "social": "Síguenos",
+    "legalLinks": {
+      "affiliate": "Divulgación de afiliados",
+      "privacy": "Política de privacidad",
+      "terms": "Términos del servicio"
+    },
+    "affiliateDisclosure": "Divulgación de afiliados: Gsirigo puede recibir una comisión cuando completas una reserva tras hacer clic en un widget o enlace de socio. Esto nunca afecta al precio que pagas.",
+    "rights": "Todos los derechos reservados."
+  },
+  "Hero": {
+    "badge": "Comparador de alquiler de coche de confianza",
+    "title": "Compara y reserva los alquileres de coche más baratos del mundo",
+    "subtitle": "Compara al instante las mejores marcas de alquiler — sin comisiones ocultas. Encuentra el coche adecuado al precio adecuado y reserva de forma segura con nuestros socios de confianza.",
+    "trust0": "Sin comisiones ocultas",
+    "trust1": "Cancelación gratuita en la mayoría de reservas",
+    "trust2": "Mejor precio garantizado"
+  },
+  "TrustBar": {
+    "destinations": "Destinos cubiertos",
+    "partners": "Socios de confianza",
+    "guarantee": "Mejor precio garantizado",
+    "destinationsValue": "120+",
+    "partnersValue": "3+",
+    "guaranteeValue": "24/7"
+  },
+  "HowItWorks": {
+    "title": "Cómo funciona",
+    "subtitle": "Reserva un coche de alquiler en tres sencillos pasos.",
+    "step1Title": "Busca",
+    "step1Desc": "Introduce tu punto de recogida, las fechas y la edad del conductor en el widget de búsqueda.",
+    "step2Title": "Compara",
+    "step2Desc": "Consulta ofertas de marcas de alquiler de confianza, una al lado de otra, al instante.",
+    "step3Title": "Reserva de forma segura",
+    "step3Desc": "Completa tu reserva en la web del socio — de forma segura y protegida."
+  },
+  "Widget": {
+    "searchTitle": "Encuentra tu coche de alquiler",
+    "search": "Buscar ofertas",
+    "pickup": "Punto de recogida",
+    "cityPlaceholder": "p. ej. Aeropuerto de Dubái",
+    "pickupDate": "Fecha de recogida",
+    "dropoffDate": "Fecha de devolución",
+    "driverAge": "Edad del conductor",
+    "note": "Sin comisiones ocultas · cancelación gratuita en la mayoría de reservas",
+    "disclosure": "Serás redirigido a la web del socio para completar tu reserva.",
+    "poweredBy": "Con la tecnología de"
+  },
+  "Destinations": {
+    "title": "Destinos populares",
+    "subtitle": "Búsquedas pre-rellenadas para las ciudades más reservadas: elige un destino y compara ofertas al instante."
+  },
+  "LatestArticles": {
+    "title": "Últimos artículos",
+    "subtitle": "Guías prácticas para ahorrar en tu próximo alquiler.",
+    "viewAll": "Ver todos los artículos"
+  },
+  "ArticlesPage": {
+    "title": "Guías y ofertas de alquiler de coche",
+    "subtitle": "Guías de expertos, consejos para ahorrar y comparativas honestas: todo lo que necesitas antes de reservar.",
+    "metaTitle": "Guías y ofertas de alquiler de coche | Gsirigo",
+    "metaDescription": "Guías prácticas de alquiler de coche: encuentra las mejores ofertas, evita errores comunes, compara proveedores y alquila con confianza en todo el mundo."
+  },
+  "ArticlePage": {
+    "backToArticles": "Volver a todos los artículos",
+    "relatedDestination": "¿Alquilas un coche en este destino?"
+  },
+  "DestinationsPage": {
+    "title": "Destinos de alquiler de coche",
+    "subtitle": "Explora nuestras guías de destinos: cada una incluye una búsqueda pre-rellenada para comparar ofertas en segundos.",
+    "metaTitle": "Destinos de alquiler de coche | Gsirigo",
+    "metaDescription": "Guías de alquiler de coche para los destinos más populares del mundo: Dubái, España, Italia, Turquía, Marruecos, Grecia y más."
+  },
+  "DestinationPage": {
+    "title": "Alquiler de coche en {city}",
+    "metaTitle": "Alquiler de coche en {city}: compara y reserva las mejores ofertas",
+    "metaDescription": "Alquiler de coche en {city}, {country}: precios, requisitos, consejos y las mejores ofertas de socios de confianza. Compara al instante.",
+    "backToDestinations": "Volver a todos los destinos",
+    "relatedArticles": "Guías relacionadas"
+  },
+  "About": {
+    "title": "Sobre Gsirigo",
+    "subtitle": "Te ayudamos a comparar y reservar coches de alquiler de socios de confianza de todo el mundo — rápido, transparente y sin comisiones ocultas.",
+    "missionTitle": "Nuestra misión",
+    "missionBody": "Alquilar un coche en el extranjero no debería ser una lotería. Gsirigo hace que la comparación sea rápida y transparente: mostramos ofertas de marcas consolidadas a través de los widgets de búsqueda de nuestros socios, para que siempre sepas qué reservas y cuánto cuesta.",
+    "howTitle": "Cómo funciona",
+    "howBody": "Cada búsqueda en Gsirigo funciona con los widgets de socios Travelpayouts (Rentalcars.com, AutoEurope, EconomyBookings). Cuando buscas y eliges una oferta, continúas en la web del socio, donde la reserva se procesa de forma segura. Somos un sitio de afiliados independiente: no operamos flota y nunca gestionamos pagos.",
+    "trustTitle": "Por qué confiar en nosotros",
+    "trustBody": "Trabajamos únicamente con programas de alquiler consolidados a nivel mundial. Nuestras guías están escritas para viajeros, no para anunciantes. Y como los socios nos pagan una comisión solo cuando se completa una reserva, nuestro interés es el mismo que el tuyo: ayudarte a encontrar un gran coche a un precio justo."
+  },
+  "Contact": {
+    "title": "Contacto",
+    "subtitle": "¿Preguntas sobre un alquiler, una guía o una colaboración? Nos encantará leerte.",
+    "name": "Tu nombre",
+    "email": "Tu correo electrónico",
+    "message": "Tu mensaje",
+    "send": "Enviar mensaje",
+    "success": "¡Gracias por escribirnos! Solemos responder en 2 días laborables.",
+    "note": "Para dudas sobre una reserva existente, contacta directamente con el proveedor: las reservas se gestionan en la web del socio."
+  },
+  "Legal": {
+    "updated": "Última actualización"
+  },
+  "NotFound": {
+    "title": "Página no encontrada",
+    "message": "La página que buscas no existe o se ha movido. Volvamos a la carretera.",
+    "back": "Volver al inicio"
+  }
+}

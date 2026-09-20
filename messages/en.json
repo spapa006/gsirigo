@@ -1,0 +1,140 @@
+{
+  "Meta": {
+    "brand": "Gsirigo",
+    "title": "Compare & Book Cheap Car Rentals Worldwide | Gsirigo",
+    "description": "Instantly compare car rental deals from trusted partners — Rentalcars, AutoEurope, EconomyBookings. No hidden fees, free cancellation on most bookings, best price guaranteed."
+  },
+  "Common": {
+    "ctaTitle": "Ready to compare car rental prices?",
+    "ctaDescription": "Search once and compare offers from multiple trusted rental brands side by side. You'll be redirected to the partner's website to securely complete your booking.",
+    "ctaButton": "Compare prices now",
+    "updated": "Last updated"
+  },
+  "Header": {
+    "disclosure": "Our offers are displayed through search widgets provided by our trusted partners. After searching and selecting an offer, you'll be redirected to the partner's website to securely complete your booking.",
+    "nav": {
+      "home": "Home",
+      "articles": "Articles",
+      "destinations": "Destinations",
+      "about": "About",
+      "contact": "Contact"
+    },
+    "language": "Language",
+    "menu": "Menu",
+    "close": "Close",
+    "trustRow": "Search with:"
+  },
+  "Footer": {
+    "tagline": "Gsirigo compares car rental offers from trusted partners around the world so you can find the right car at the right price in minutes.",
+    "partnerNote": "Bookings are searched, priced and completed on our partners' websites. Gsirigo never handles your booking or payment directly.",
+    "quickLinks": "Quick Links",
+    "partners": "Partners",
+    "legal": "Legal",
+    "social": "Follow us",
+    "legalLinks": {
+      "affiliate": "Affiliate Disclosure",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "affiliateDisclosure": "Affiliate Disclosure: Gsirigo may earn a commission when you complete a booking after clicking through a partner widget or link. This never affects the price you pay.",
+    "rights": "All rights reserved."
+  },
+  "Hero": {
+    "badge": "Trusted car rental comparison",
+    "title": "Compare and Book the Cheapest Car Rentals Worldwide",
+    "subtitle": "Instantly compare top car rental brands — no hidden fees. Find the right car at the right price and book securely through our trusted partners.",
+    "trust0": "No hidden fees",
+    "trust1": "Free cancellation on most bookings",
+    "trust2": "Best price guarantee"
+  },
+  "TrustBar": {
+    "destinations": "Destinations covered",
+    "partners": "Trusted rental partners",
+    "guarantee": "Best price guarantee",
+    "destinationsValue": "120+",
+    "partnersValue": "3+",
+    "guaranteeValue": "24/7"
+  },
+  "HowItWorks": {
+    "title": "How it works",
+    "subtitle": "Book a rental car in three simple steps.",
+    "step1Title": "Search",
+    "step1Desc": "Enter your pickup location, dates and driver age in the search widget.",
+    "step2Title": "Compare",
+    "step2Desc": "See offers from trusted rental brands side by side, instantly.",
+    "step3Title": "Book securely",
+    "step3Desc": "Complete your booking on the partner's website — safe and protected."
+  },
+  "Widget": {
+    "searchTitle": "Find your car rental",
+    "search": "Search deals",
+    "pickup": "Pickup location",
+    "cityPlaceholder": "e.g. Dubai Airport",
+    "pickupDate": "Pick-up date",
+    "dropoffDate": "Drop-off date",
+    "driverAge": "Driver age",
+    "note": "No hidden fees · free cancellation on most bookings",
+    "disclosure": "You'll be redirected to the partner's website to complete your booking.",
+    "poweredBy": "Powered by"
+  },
+  "Destinations": {
+    "title": "Popular destinations",
+    "subtitle": "Pre-filled searches for the most booked cities — pick a destination and compare deals instantly."
+  },
+  "LatestArticles": {
+    "title": "Latest articles",
+    "subtitle": "Practical guides to save money on your next rental.",
+    "viewAll": "View all articles"
+  },
+  "ArticlesPage": {
+    "title": "Car Rental Guides & Deals",
+    "subtitle": "Expert guides, price-saving tips and honest comparisons — everything you need before you book.",
+    "metaTitle": "Car Rental Guides & Deals | Gsirigo",
+    "metaDescription": "Practical car rental guides: find the cheapest deals, avoid common mistakes, compare providers and rent with confidence worldwide."
+  },
+  "ArticlePage": {
+    "backToArticles": "Back to all articles",
+    "relatedDestination": "Renting in this destination?"
+  },
+  "DestinationsPage": {
+    "title": "Car Rental Destinations",
+    "subtitle": "Explore our destination guides — each one comes with a pre-filled search so you can compare deals in seconds.",
+    "metaTitle": "Car Rental Destinations | Gsirigo",
+    "metaDescription": "Car rental guides for the world's most popular destinations: Dubai, Spain, Italy, Turkey, Morocco, Greece and more."
+  },
+  "DestinationPage": {
+    "title": "Car Rental in {city}",
+    "metaTitle": "Car Rental in {city}: Compare & Book Cheap Deals",
+    "metaDescription": "Car rental in {city}, {country}: prices, requirements, tips and the best deals from trusted partners. Compare offers instantly.",
+    "backToDestinations": "Back to all destinations",
+    "relatedArticles": "Related guides"
+  },
+  "About": {
+    "title": "About Gsirigo",
+    "subtitle": "We help you compare and book rental cars from trusted partners around the world — quickly, transparently and without hidden fees.",
+    "missionTitle": "Our mission",
+    "missionBody": "Renting a car abroad shouldn't feel like a gamble. Gsirigo exists to make car rental comparison fast and transparent: we show offers from established rental brands through our partners' search widgets, so you always know what you're getting and what it costs.",
+    "howTitle": "How it works",
+    "howBody": "Every search on Gsirigo is powered by Travelpayouts partner widgets (Rentalcars.com, AutoEurope, EconomyBookings). When you search and select an offer, you continue on the partner's website where the booking is processed securely. We're an independent affiliate site — we don't operate a rental fleet and we never handle payments.",
+    "trustTitle": "Why trust us",
+    "trustBody": "We only work with established, worldwide car rental programs. Our guides are written for travellers, not for advertisers. And because partners pay us a commission only when a booking is completed, our interest is the same as yours: helping you find a great car at a fair price."
+  },
+  "Contact": {
+    "title": "Contact us",
+    "subtitle": "Questions about a rental, a guide or a partnership? We'd love to hear from you.",
+    "name": "Your name",
+    "email": "Your email",
+    "message": "Your message",
+    "send": "Send message",
+    "success": "Thanks for reaching out! We usually reply within 2 business days.",
+    "note": "For questions about an existing reservation, please contact the rental provider directly — bookings are handled on the partner's website."
+  },
+  "Legal": {
+    "updated": "Last updated"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "message": "The page you're looking for doesn't exist or has been moved. Let's get you back on the road.",
+    "back": "Go back home"
+  }
+}

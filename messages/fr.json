@@ -1,0 +1,140 @@
+{
+  "Meta": {
+    "brand": "Gsirigo",
+    "title": "Comparez et réservez des locations de voiture pas chères partout dans le monde | Gsirigo",
+    "description": "Comparez instantanément les offres de location de voiture de partenaires de confiance — Rentalcars, AutoEurope, EconomyBookings. Sans frais cachés, annulation gratuite sur la plupart des réservations, meilleur prix garanti."
+  },
+  "Common": {
+    "ctaTitle": "Prêt à comparer les prix des locations de voiture ?",
+    "ctaDescription": "Effectuez une seule recherche et comparez côte à côte les offres de plusieurs marques de location de confiance. Vous serez redirigé vers le site du partenaire pour finaliser votre réservation en toute sécurité.",
+    "ctaButton": "Comparer les prix maintenant",
+    "updated": "Dernière mise à jour"
+  },
+  "Header": {
+    "disclosure": "Nos offres sont affichées via les widgets de recherche fournis par nos partenaires de confiance. Après avoir recherché et choisi une offre, vous serez redirigé vers le site du partenaire pour finaliser votre réservation en toute sécurité.",
+    "nav": {
+      "home": "Accueil",
+      "articles": "Articles",
+      "destinations": "Destinations",
+      "about": "À propos",
+      "contact": "Contact"
+    },
+    "language": "Langue",
+    "menu": "Menu",
+    "close": "Fermer",
+    "trustRow": "Rechercher avec :"
+  },
+  "Footer": {
+    "tagline": "Gsirigo compare les offres de location de voiture de partenaires de confiance dans le monde entier, pour que vous trouviez la bonne voiture au bon prix en quelques minutes.",
+    "partnerNote": "Les réservations sont recherchées, tarifées et finalisées sur les sites de nos partenaires. Gsirigo ne gère jamais votre réservation ni votre paiement directement.",
+    "quickLinks": "Liens rapides",
+    "partners": "Partenaires",
+    "legal": "Mentions légales",
+    "social": "Suivez-nous",
+    "legalLinks": {
+      "affiliate": "Divulgation d'affiliation",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation"
+    },
+    "affiliateDisclosure": "Divulgation d'affiliation : Gsirigo peut percevoir une commission lorsque vous finalisez une réservation après avoir cliqué sur un widget ou un lien partenaire. Cela n'affecte jamais le prix que vous payez.",
+    "rights": "Tous droits réservés."
+  },
+  "Hero": {
+    "badge": "Comparateur de location de voiture de confiance",
+    "title": "Comparez et réservez les locations de voiture les moins chères du monde",
+    "subtitle": "Comparez instantanément les grandes marques de location — sans frais cachés. Trouvez la bonne voiture au bon prix et réservez en toute sécurité via nos partenaires de confiance.",
+    "trust0": "Sans frais cachés",
+    "trust1": "Annulation gratuite sur la plupart des réservations",
+    "trust2": "Meilleur prix garanti"
+  },
+  "TrustBar": {
+    "destinations": "Destinations couvertes",
+    "partners": "Partenaires de confiance",
+    "guarantee": "Meilleur prix garanti",
+    "destinationsValue": "120+",
+    "partnersValue": "3+",
+    "guaranteeValue": "24/7"
+  },
+  "HowItWorks": {
+    "title": "Comment ça marche",
+    "subtitle": "Réservez une voiture de location en trois étapes simples.",
+    "step1Title": "Recherchez",
+    "step1Desc": "Saisissez votre lieu de prise en charge, vos dates et l'âge du conducteur dans le widget de recherche.",
+    "step2Title": "Comparez",
+    "step2Desc": "Visualisez instantanément les offres des marques de location de confiance, côte à côte.",
+    "step3Title": "Réservez en toute sécurité",
+    "step3Desc": "Finalisez votre réservation sur le site du partenaire — en toute sécurité."
+  },
+  "Widget": {
+    "searchTitle": "Trouvez votre voiture de location",
+    "search": "Rechercher des offres",
+    "pickup": "Lieu de prise en charge",
+    "cityPlaceholder": "ex. Aéroport de Dubaï",
+    "pickupDate": "Date de prise en charge",
+    "dropoffDate": "Date de restitution",
+    "driverAge": "Âge du conducteur",
+    "note": "Sans frais cachés · annulation gratuite sur la plupart des réservations",
+    "disclosure": "Vous serez redirigé vers le site du partenaire pour finaliser votre réservation.",
+    "poweredBy": "Propulsé par"
+  },
+  "Destinations": {
+    "title": "Destinations populaires",
+    "subtitle": "Des recherches pré-remplies pour les villes les plus réservées — choisissez une destination et comparez les offres instantanément."
+  },
+  "LatestArticles": {
+    "title": "Derniers articles",
+    "subtitle": "Des guides pratiques pour économiser sur votre prochaine location.",
+    "viewAll": "Voir tous les articles"
+  },
+  "ArticlesPage": {
+    "title": "Guides et offres de location de voiture",
+    "subtitle": "Guides d'experts, astuces pour économiser et comparatifs honnêtes — tout ce qu'il vous faut avant de réserver.",
+    "metaTitle": "Guides et offres de location de voiture | Gsirigo",
+    "metaDescription": "Guides pratiques de location de voiture : trouvez les meilleures offres, évitez les erreurs courantes, comparez les prestataires et louez en toute confiance partout dans le monde."
+  },
+  "ArticlePage": {
+    "backToArticles": "Retour à tous les articles",
+    "relatedDestination": "Vous louez une voiture sur place ?"
+  },
+  "DestinationsPage": {
+    "title": "Destinations de location de voiture",
+    "subtitle": "Découvrez nos guides par destination — chacun contient une recherche pré-remplie pour comparer les offres en quelques secondes.",
+    "metaTitle": "Destinations de location de voiture | Gsirigo",
+    "metaDescription": "Guides de location de voiture pour les destinations les plus populaires : Dubaï, Espagne, Italie, Turquie, Maroc, Grèce et plus encore."
+  },
+  "DestinationPage": {
+    "title": "Location de voiture à {city}",
+    "metaTitle": "Location de voiture à {city} : comparez et réservez les meilleures offres",
+    "metaDescription": "Location de voiture à {city}, {country} : prix, conditions, conseils et meilleures offres de partenaires de confiance. Comparez instantanément.",
+    "backToDestinations": "Retour à toutes les destinations",
+    "relatedArticles": "Guides associés"
+  },
+  "About": {
+    "title": "À propos de Gsirigo",
+    "subtitle": "Nous vous aidons à comparer et réserver des voitures de location auprès de partenaires de confiance dans le monde entier — rapidement, en toute transparence et sans frais cachés.",
+    "missionTitle": "Notre mission",
+    "missionBody": "Louer une voiture à l'étranger ne devrait pas être un pari. Gsirigo rend la comparaison rapide et transparente : nous affichons les offres de marques de location établies via les widgets de recherche de nos partenaires, pour que vous sachiez toujours ce que vous réservez et à quel prix.",
+    "howTitle": "Comment ça marche",
+    "howBody": "Chaque recherche sur Gsirigo repose sur les widgets partenaires Travelpayouts (Rentalcars.com, AutoEurope, EconomyBookings). Lorsque vous cherchez et choisissez une offre, vous poursuivez sur le site du partenaire où la réservation est traitée en toute sécurité. Nous sommes un site d'affiliation indépendant — nous ne possédons pas de flotte et ne traitons jamais les paiements.",
+    "trustTitle": "Pourquoi nous faire confiance",
+    "trustBody": "Nous travaillons uniquement avec des programmes de location reconnus à l'échelle mondiale. Nos guides sont écrits pour les voyageurs, pas pour les annonceurs. Et comme les partenaires ne nous versent une commission que lorsqu'une réservation aboutit, notre intérêt est le même que le vôtre : vous aider à trouver une excellente voiture au juste prix."
+  },
+  "Contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Une question sur une location, un guide ou un partenariat ? Nous serions ravis de vous lire.",
+    "name": "Votre nom",
+    "email": "Votre e-mail",
+    "message": "Votre message",
+    "send": "Envoyer le message",
+    "success": "Merci pour votre message ! Nous répondons généralement sous 2 jours ouvrés.",
+    "note": "Pour toute question concernant une réservation existante, contactez directement le prestataire — les réservations sont gérées sur le site du partenaire."
+  },
+  "Legal": {
+    "updated": "Dernière mise à jour"
+  },
+  "NotFound": {
+    "title": "Page introuvable",
+    "message": "La page que vous recherchez n'existe pas ou a été déplacée. Remettons-nous en route.",
+    "back": "Retour à l'accueil"
+  }
+}
