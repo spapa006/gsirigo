@@ -157,7 +157,7 @@ export function DestinationForm({
         </label>
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold text-slate-600">Image URL</span>
-          <Input value={values.image} onChange={(e) => set('image', e.target.value)} placeholder="https://picsum.photos/…" />
+          <Input value={values.image} onChange={(e) => set('image', e.target.value)} placeholder="https://images.unsplash.com/photo-…" />
         </label>
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold text-slate-600">Sort weight (low = first)</span>

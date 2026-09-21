@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/require-admin';
 import { saveRedirect } from '@/lib/db/repositories/redirects';
+import { serverErrorResponse } from '@/lib/api/error-response';
 
 export const runtime = 'nodejs';
 
@@ -42,13 +43,17 @@ export async function POST(request: Request) {
     );
   }
 
-  await saveRedirect({
-    slug,
-    destinationUrl,
-    partner: body.partner ? String(body.partner).trim() : null,
-    label: String(body.label ?? ''),
-    isActive: body.isActive !== false,
-  });
+  try {
+    await saveRedirect({
+      slug,
+      destinationUrl,
+      partner: body.partner ? String(body.partner).trim() : null,
+      label: String(body.label ?? ''),
+      isActive: body.isActive !== false,
+    });
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
 
   return NextResponse.json({ ok: true, slug });
 }

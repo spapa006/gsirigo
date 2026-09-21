@@ -127,7 +127,7 @@ widget: { partner, city, country }   # optional pre-filled embed
 
 `npm run db:seed` imports them once (skip-if-not-empty; `--force` re-imports). After that, edits happen in the admin and the site renders from the DB. Public pages read DB-first with the MDX/static data as fallback, then revalidate on admin saves.
 
-Images are Picsum placeholders (`picsum.photos/seed/...`) — replace with your own photography before launch (`next/image` `remotePatterns` in `next.config.ts` already allow Unsplash).
+Destination cards, destination pages and article heroes use free-to-use Unsplash travel photos matched to each topic (skyline, landmark, road scene — e.g. Burj Khalifa for Dubai, Sagrada Família for Spain, Acropolis for Greece). To swap one, update the `image` field in `lib/destinations.ts` or the article MDX frontmatter in `content/{en,fr,es,ar}/articles/` — `next/image` `remotePatterns` in `next.config.ts` allow `images.unsplash.com` (self-host by moving files to `public/images` if preferred).
 
 ## SEO
 

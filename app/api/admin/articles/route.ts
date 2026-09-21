@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/require-admin';
 import { deleteArticle, saveArticle, LOCALES } from '@/lib/db/repositories/articles';
 import { revalidateArticle } from '@/lib/revalidate';
+import { serverErrorResponse } from '@/lib/api/error-response';
 
 export const runtime = 'nodejs';
 
@@ -38,23 +39,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Body is required.' }, { status: 400 });
   }
 
-  await saveArticle({
-    slug,
-    locale,
-    status,
-    title: String(body.title),
-    excerpt: String(body.excerpt ?? ''),
-    metaTitle: String(body.metaTitle ?? ''),
-    metaDescription: String(body.metaDescription ?? ''),
-    image: String(body.image ?? ''),
-    date: String(body.date ?? new Date().toISOString().slice(0, 10)),
-    readingTime: String(body.readingTime ?? ''),
-    destination: body.destination ? String(body.destination) : undefined,
-    widgetPartner: body.widgetPartner ? String(body.widgetPartner) : undefined,
-    widgetCity: body.widgetCity ? String(body.widgetCity) : undefined,
-    widgetCountry: body.widgetCountry ? String(body.widgetCountry) : undefined,
-    body: String(body.body),
-  });
+  try {
+    await saveArticle({
+      slug,
+      locale,
+      status,
+      title: String(body.title),
+      excerpt: String(body.excerpt ?? ''),
+      metaTitle: String(body.metaTitle ?? ''),
+      metaDescription: String(body.metaDescription ?? ''),
+      image: String(body.image ?? ''),
+      date: String(body.date ?? new Date().toISOString().slice(0, 10)),
+      readingTime: String(body.readingTime ?? ''),
+      destination: body.destination ? String(body.destination) : undefined,
+      widgetPartner: body.widgetPartner ? String(body.widgetPartner) : undefined,
+      widgetCity: body.widgetCity ? String(body.widgetCity) : undefined,
+      widgetCountry: body.widgetCountry ? String(body.widgetCountry) : undefined,
+      body: String(body.body),
+    });
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
 
   revalidateArticle(locale, slug);
   return NextResponse.json({ ok: true, slug, locale });
@@ -72,7 +77,11 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'slug and locale are required.' }, { status: 400 });
   }
 
-  await deleteArticle(slug, locale);
+  try {
+    await deleteArticle(slug, locale);
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
   revalidateArticle(locale, slug);
   return NextResponse.json({ ok: true });
 }

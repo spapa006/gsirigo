@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/require-admin';
 import { saveSettings, SETTING_KEYS } from '@/lib/db/repositories/settings';
 import { revalidateSiteWide } from '@/lib/revalidate';
+import { serverErrorResponse } from '@/lib/api/error-response';
 
 export const runtime = 'nodejs';
 
@@ -22,7 +23,11 @@ export async function POST(request: Request) {
     if (typeof value === 'string') entries[key] = value;
   }
 
-  await saveSettings(entries);
+  try {
+    await saveSettings(entries);
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
   revalidateSiteWide();
   return NextResponse.json({ ok: true });
 }

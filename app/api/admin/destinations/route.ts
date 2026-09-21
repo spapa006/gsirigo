@@ -5,6 +5,7 @@ import {
   saveDestination,
 } from '@/lib/db/repositories/destinations';
 import { revalidateDestination } from '@/lib/revalidate';
+import { serverErrorResponse } from '@/lib/api/error-response';
 
 export const runtime = 'nodejs';
 
@@ -40,20 +41,24 @@ export async function POST(request: Request) {
     ? body.highlights.map(String)
     : [];
 
-  await saveDestination({
-    slug,
-    locale,
-    name: String(body.name ?? ''),
-    country: String(body.country ?? ''),
-    city: String(body.city ?? ''),
-    tagline: String(body.tagline ?? ''),
-    description: String(body.description ?? ''),
-    highlights,
-    priceFrom: String(body.priceFrom ?? ''),
-    image: String(body.image ?? ''),
-    weight: Number.isFinite(Number(body.weight)) ? Number(body.weight) : 99,
-    active: body.active !== false,
-  });
+  try {
+    await saveDestination({
+      slug,
+      locale,
+      name: String(body.name ?? ''),
+      country: String(body.country ?? ''),
+      city: String(body.city ?? ''),
+      tagline: String(body.tagline ?? ''),
+      description: String(body.description ?? ''),
+      highlights,
+      priceFrom: String(body.priceFrom ?? ''),
+      image: String(body.image ?? ''),
+      weight: Number.isFinite(Number(body.weight)) ? Number(body.weight) : 99,
+      active: body.active !== false,
+    });
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
 
   revalidateDestination(locale, slug);
   return NextResponse.json({ ok: true, slug, locale });
@@ -70,7 +75,11 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'slug and locale are required.' }, { status: 400 });
   }
 
-  await deleteDestination(slug, locale);
+  try {
+    await deleteDestination(slug, locale);
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
   revalidateDestination(locale, slug);
   return NextResponse.json({ ok: true });
 }

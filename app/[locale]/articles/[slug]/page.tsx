@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 import { CalendarDays, Clock, CornerUpLeft } from 'lucide-react';
 import { getArticle, listArticleSlugs } from '@/lib/db/repositories/articles';
 import { getManagedDestination } from '@/lib/db/repositories/destinations';
@@ -111,6 +112,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <Clock className="h-4 w-4" />
             {meta.readingTime}
           </span>
+        </div>
+
+        {/* Topically relevant cover image (from article frontmatter) */}
+        <div className="relative mt-8 aspect-[16/9] w-full overflow-hidden rounded-2xl bg-muted">
+          <Image
+            src={meta.image}
+            alt={meta.title}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-cover"
+          />
         </div>
 
         <div className="prose prose-slate mt-10 max-w-none dark:prose-invert">

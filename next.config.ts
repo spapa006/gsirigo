@@ -8,9 +8,9 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
   },
   images: {
-    // Draft placeholder images. Replace with your own photography/Unsplash at launch.
+    // Free-to-use travel photos served from the Unsplash CDN. To self-host
+    // later, drop files under public/images and remove this remotePatterns block.
     remotePatterns: [
-      { protocol: 'https', hostname: 'picsum.photos' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },

@@ -26,6 +26,24 @@ function resolveUrl(): string {
   const fromEnv =
     process.env.LIBSQL_URL?.trim() || process.env.DATABASE_URL?.trim();
   if (fromEnv) return fromEnv;
+
+  // Production safety net: without a remote URL, the file fallback targets an
+  // ephemeral serverless filesystem — admin writes would silently "succeed"
+  // and never persist, or crash with a confusing EACCES. Fail loudly instead.
+  // Self-hosters running `next start` locally can opt back into the file DB
+  // with GSIRIGO_ALLOW_FILE_DB=1 (reads fall back to static content anyway,
+  // so public pages are unaffected).
+  if (
+    process.env.NODE_ENV === 'production' &&
+    process.env.GSIRIGO_ALLOW_FILE_DB !== '1'
+  ) {
+    throw new Error(
+      'Admin writes are disabled: LIBSQL_URL (or DATABASE_URL) is not set. ' +
+        'Point it at your Turso database and set LIBSQL_AUTH_TOKEN, ' +
+        "or set GSIRIGO_ALLOW_FILE_DB=1 to allow the local file DB (self-host only)."
+    );
+  }
+
   // Default local dev database file.
   const dataDir = path.join(process.cwd(), 'data');
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });

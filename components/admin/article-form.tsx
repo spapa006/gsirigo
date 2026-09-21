@@ -171,7 +171,7 @@ export function ArticleForm({
           <Input value={values.metaDescription} onChange={(e) => set('metaDescription', e.target.value)} />
         </Field>
 
-        <Field label="Image URL" hint="Picsum placeholder by default">
+        <Field label="Image URL" hint="Unsplash CDN URL by default (images.unsplash.com/photo-…)">
           <Input value={values.image} onChange={(e) => set('image', e.target.value)} />
         </Field>
 

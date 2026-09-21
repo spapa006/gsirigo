@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/require-admin';
 import { deleteRedirect } from '@/lib/db/repositories/redirects';
+import { serverErrorResponse } from '@/lib/api/error-response';
 
 export const runtime = 'nodejs';
 
@@ -16,6 +17,10 @@ export async function DELETE(
     return NextResponse.json({ error: 'slug is required.' }, { status: 400 });
   }
 
-  await deleteRedirect(slug);
+  try {
+    await deleteRedirect(slug);
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
   return NextResponse.json({ ok: true });
 }

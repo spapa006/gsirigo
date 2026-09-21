@@ -3,6 +3,7 @@ import { requireAdmin } from '@/lib/auth/require-admin';
 import { savePartner } from '@/lib/db/repositories/partners';
 import type { PartnerId } from '@/lib/partners';
 import { revalidateSiteWide } from '@/lib/revalidate';
+import { serverErrorResponse } from '@/lib/api/error-response';
 
 export const runtime = 'nodejs';
 
@@ -29,20 +30,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid locale.' }, { status: 400 });
   }
 
-  await savePartner({
-    id: id as PartnerId,
-    locale,
-    name: String(body.name ?? ''),
-    shortName: String(body.shortName ?? ''),
-    tagline: String(body.tagline ?? ''),
-    baseUrl: String(body.baseUrl ?? ''),
-    color: String(body.color ?? '#1d4ed8'),
-    commissionNote: String(body.commissionNote ?? ''),
-    embed: String(body.embed ?? ''),
-    active: body.active !== false,
-    marker: body.marker ? String(body.marker) : undefined,
-    subId: body.subId ? String(body.subId) : undefined,
-  });
+  try {
+    await savePartner({
+      id: id as PartnerId,
+      locale,
+      name: String(body.name ?? ''),
+      shortName: String(body.shortName ?? ''),
+      tagline: String(body.tagline ?? ''),
+      baseUrl: String(body.baseUrl ?? ''),
+      color: String(body.color ?? '#1d4ed8'),
+      commissionNote: String(body.commissionNote ?? ''),
+      embed: String(body.embed ?? ''),
+      active: body.active !== false,
+      marker: body.marker ? String(body.marker) : undefined,
+      subId: body.subId ? String(body.subId) : undefined,
+    });
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
 
   revalidateSiteWide();
   return NextResponse.json({ ok: true, id, locale });

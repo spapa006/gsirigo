@@ -16,7 +16,7 @@ export type DestinationLocalized = {
 
 export type Destination = {
   slug: string;
-  /** Draft placeholder image (replace with real photography at launch) */
+  /** Free-to-use travel photo that visually represents this destination (Unsplash CDN) */
   image: string;
   /** Sort weight for the homepage */
   weight: number;
@@ -26,7 +26,7 @@ export type Destination = {
 export const destinations: Destination[] = [
   {
     slug: 'dubai',
-    image: 'https://picsum.photos/seed/gsirigo-dubai/1200/800',
+    image: 'https://images.unsplash.com/photo-1746731341047-76b2652ea843?q=80&w=1600&auto=format&fit=crop', // Burj Khalifa, Dubai
     weight: 1,
     i18n: {
       en: {
@@ -73,7 +73,7 @@ export const destinations: Destination[] = [
   },
   {
     slug: 'spain',
-    image: 'https://picsum.photos/seed/gsirigo-spain/1200/800',
+    image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?q=80&w=1600&auto=format&fit=crop', // Sagrada Família, Barcelona
     weight: 2,
     i18n: {
       en: {
@@ -120,7 +120,7 @@ export const destinations: Destination[] = [
   },
   {
     slug: 'italy',
-    image: 'https://picsum.photos/seed/gsirigo-italy/1200/800',
+    image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1600&auto=format&fit=crop', // Colosseum, Rome
     weight: 3,
     i18n: {
       en: {
@@ -167,7 +167,7 @@ export const destinations: Destination[] = [
   },
   {
     slug: 'turkey',
-    image: 'https://picsum.photos/seed/gsirigo-turkey/1200/800',
+    image: 'https://images.unsplash.com/photo-1752926269883-78794047bac5?q=80&w=1600&auto=format&fit=crop', // Hagia Sophia, Istanbul
     weight: 4,
     i18n: {
       en: {
@@ -214,7 +214,7 @@ export const destinations: Destination[] = [
   },
   {
     slug: 'morocco',
-    image: 'https://picsum.photos/seed/gsirigo-morocco/1200/800',
+    image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1600&auto=format&fit=crop', // Chefchaouen, Morocco
     weight: 5,
     i18n: {
       en: {
@@ -261,7 +261,7 @@ export const destinations: Destination[] = [
   },
   {
     slug: 'greece',
-    image: 'https://picsum.photos/seed/gsirigo-greece/1200/800',
+    image: 'https://images.unsplash.com/photo-1555993539-1732b0258235?q=80&w=1600&auto=format&fit=crop', // Acropolis, Athens
     weight: 6,
     i18n: {
       en: {
