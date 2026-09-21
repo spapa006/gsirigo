@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/require-admin';
-import { savePartner } from '@/lib/db/repositories/partners';
+import { deletePartner, savePartner } from '@/lib/db/repositories/partners';
 import type { PartnerId } from '@/lib/partners';
 import { revalidateSiteWide } from '@/lib/revalidate';
 import { serverErrorResponse } from '@/lib/api/error-response';
@@ -54,4 +54,30 @@ export async function POST(request: Request) {
 
   revalidateSiteWide();
   return NextResponse.json({ ok: true, id, locale });
+}
+
+const LOCALES = ['en', 'fr', 'es', 'ar'];
+
+export async function DELETE(request: Request) {
+  const auth = await requireAdmin(request);
+  if (auth instanceof NextResponse) return auth;
+
+  const url = new URL(request.url);
+  const id = url.searchParams.get('id') ?? '';
+  const locale = url.searchParams.get('locale') ?? '';
+
+  if (!PARTNER_IDS.includes(id as PartnerId)) {
+    return NextResponse.json({ error: 'Unknown partner id.' }, { status: 400 });
+  }
+  if (!LOCALES.includes(locale)) {
+    return NextResponse.json({ error: 'Invalid locale.' }, { status: 400 });
+  }
+
+  try {
+    await deletePartner(id as PartnerId, locale);
+  } catch (error) {
+    return serverErrorResponse(error);
+  }
+  revalidateSiteWide();
+  return NextResponse.json({ ok: true });
 }

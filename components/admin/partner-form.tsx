@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Save, AlertCircle } from 'lucide-react';
+import { Loader2, Save, Trash2, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -76,6 +76,24 @@ export function PartnerForm({
     } catch {
       setError('Failed to save partner. Check your connection and try again.');
     } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!values.id || !values.locale) return;
+    if (!window.confirm(`Delete "${values.id}" (${values.locale})? This cannot be undone.`)) return;
+    setBusy(true);
+    try {
+      const res = await fetch(
+        `/api/admin/partners?id=${encodeURIComponent(values.id)}&locale=${values.locale}`,
+        { method: 'DELETE' }
+      );
+      if (!res.ok) throw new Error();
+      router.push('/admin/partners');
+      router.refresh();
+    } catch {
+      setError('Failed to delete partner.');
       setBusy(false);
     }
   }
@@ -178,6 +196,12 @@ export function PartnerForm({
           <Save />
           Save partner
         </Button>
+        {initial && (
+          <Button type="button" variant="destructive" onClick={handleDelete} disabled={busy}>
+            <Trash2 />
+            Delete this locale row
+          </Button>
+        )}
       </div>
     </div>
   );

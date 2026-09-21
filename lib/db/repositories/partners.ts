@@ -151,6 +151,14 @@ export async function getPartnerRow(
   }
 }
 
+export async function deletePartner(id: string, locale: string): Promise<void> {
+  await withDb(async (db) => {
+    await db
+      .delete(partners)
+      .where(and(eq(partners.id, id), eq(partners.locale, locale)));
+  });
+}
+
 export async function countPartners(): Promise<number> {
   try {
     const db = getDb();

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Handshake, Plus } from 'lucide-react';
 import { listAllPartnerRows } from '@/lib/db/repositories/partners';
+import { PartnerRowActions } from '@/components/admin/partner-row-actions';
 import { widgetEmbedHelp } from './embed-help';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -59,25 +60,27 @@ export default async function AdminPartnersPage() {
               {['en', 'fr', 'es', 'ar'].map((locale) => {
                 const row = localeRows.find((r) => r.locale === locale);
                 return (
-                  <Link
+                  <span
                     key={locale}
-                    href={`/admin/partners/${id}?locale=${locale}`}
-                    title={
-                      row
-                        ? row.embed
-                          ? `Embed saved (${row.embed.length} chars)`
-                          : 'No embed pasted yet'
-                        : 'No row for this locale — create one'
-                    }
-                    className={
-                      row?.embed
-                        ? 'rounded-md bg-teal-100 px-3 py-1.5 text-xs font-bold uppercase text-teal-800 hover:bg-teal-200'
-                        : 'rounded-md border border-dashed px-3 py-1.5 text-xs font-semibold uppercase text-slate-400 hover:border-teal-300 hover:text-teal-700'
-                    }
+                    className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 py-1 pl-1 pr-1.5"
                   >
-                    {locale}
-                    {row?.embed ? ' ✓' : ' +'}
-                  </Link>
+                    {row ? (
+                      <>
+                        <span className="px-1.5 text-xs font-semibold uppercase text-slate-600">
+                          {locale}{row.embed ? ' ✓' : ''}
+                        </span>
+                        <PartnerRowActions id={id} locale={locale} name={row.name} />
+                      </>
+                    ) : (
+                      <Link
+                        href={`/admin/partners/${id}?locale=${locale}`}
+                        title="No row for this locale — create one"
+                        className="rounded-md border border-dashed px-2 py-1 text-xs font-semibold uppercase text-slate-400 hover:border-teal-300 hover:text-teal-700"
+                      >
+                        {locale} +
+                      </Link>
+                    )}
+                  </span>
                 );
               })}
             </div>
