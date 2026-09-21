@@ -14,9 +14,17 @@ import { ensureTables } from '@/lib/db/client';
 import { getArticleMeta, getArticleSlugs, getArticleSource } from '@/lib/content';
 import { destinations as staticDestinations } from '@/lib/destinations';
 import { PARTNERS, type PartnerId } from '@/lib/partners';
+import { healArabicMojibake } from '@/lib/encoding/mojibake';
 
 const LOCALES = ['en', 'fr', 'es', 'ar'] as const;
 const force = process.argv.includes('--force');
+
+/**
+ * Safety net against ever re-corrupting the DB from a bad source file: if a
+ * static string is Arabic-mojibake (e.g. "ØªØ£Ø¬ÙŠØ± …"), heal it before the
+ * write. Proper Arabic, Latin text and everything else pass through untouched.
+ */
+const heal = (value: string) => healArabicMojibake(value) ?? value;
 
 async function seedArticles() {
   const { countArticles, saveArticle } = await import('@/lib/db/repositories/articles');
@@ -34,18 +42,18 @@ async function seedArticles() {
         slug,
         locale,
         status: 'published',
-        title: meta.title,
-        excerpt: meta.excerpt,
-        metaTitle: meta.metaTitle,
-        metaDescription: meta.metaDescription,
+        title: heal(meta.title),
+        excerpt: heal(meta.excerpt),
+        metaTitle: heal(meta.metaTitle),
+        metaDescription: heal(meta.metaDescription),
         image: meta.image,
         date: meta.date,
-        readingTime: meta.readingTime,
+        readingTime: heal(meta.readingTime),
         destination: meta.destination,
         widgetPartner: meta.widget?.partner,
-        widgetCity: meta.widget?.city,
-        widgetCountry: meta.widget?.country,
-        body,
+        widgetCity: heal(meta.widget?.city ?? ''),
+        widgetCountry: heal(meta.widget?.country ?? ''),
+        body: heal(body),
       });
       total += 1;
     }
@@ -72,12 +80,12 @@ async function seedDestinations() {
       await saveDestination({
         slug: destination.slug,
         locale,
-        name: localized.name,
-        country: localized.country,
-        city: localized.city,
-        tagline: localized.tagline,
-        description: localized.description,
-        highlights: localized.highlights,
+        name: heal(localized.name),
+        country: heal(localized.country),
+        city: heal(localized.city),
+        tagline: heal(localized.tagline),
+        description: heal(localized.description),
+        highlights: localized.highlights.map(heal),
         priceFrom: localized.priceFrom,
         image: destination.image,
         weight: destination.weight,
@@ -105,12 +113,12 @@ async function seedPartners() {
       await savePartner({
         id: partner.id as PartnerId,
         locale,
-        name: partner.name,
-        shortName: partner.shortName,
-        tagline: partner.tagline,
+        name: heal(partner.name),
+        shortName: heal(partner.shortName),
+        tagline: heal(partner.tagline),
         baseUrl: partner.baseUrl,
         color: partner.color,
-        commissionNote: partner.commissionNote,
+        commissionNote: heal(partner.commissionNote),
         embed: partner.embed,
         active: true,
         marker: undefined,

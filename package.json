@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "check:mojibake": "tsx scripts/check-mojibake.ts",
+    "repair:mojibake": "tsx scripts/repair-mojibake.ts",
     "db:seed": "tsx scripts/seed.ts",
     "password:hash": "node scripts/hash-password.mjs"
   },
