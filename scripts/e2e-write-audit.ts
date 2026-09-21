@@ -18,7 +18,11 @@ const EMAIL = process.env.ADMIN_EMAIL ?? 'rdouanben@gmail.com';
 const PASSWORD = process.env.E2E_PASSWORD ?? 'gsirigo@com';
 const DB_URL = process.env.E2E_DB_URL ?? 'file:data/gsirigo.db';
 
-const db = createClient({ url: DB_URL });
+const db = createClient({
+  url: DB_URL,
+  // Needed when E2E_DB_URL points at a remote Turso DB (LIBSQL_URL).
+  authToken: process.env.LIBSQL_AUTH_TOKEN,
+});
 
 type Result = { entity: string; created: boolean; rowLanded: boolean; cleanedUp: boolean; error?: string };
 
