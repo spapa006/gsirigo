@@ -71,7 +71,6 @@ export async function getAllArticles(
   locale: string,
   includeDrafts = false
 ): Promise<ManagedArticle[]> {
-  let fallback = true;
   try {
     const db = getDb();
     const rows = await db
@@ -81,16 +80,22 @@ export async function getAllArticles(
       .orderBy(desc(articles.date));
     const visible = includeDrafts ? rows : rows.filter((r) => r.status === 'published');
     if (visible.length > 0) {
-      fallback = false;
       return visible
         .map(rowToManagedArticle)
         .sort((a, b) => (a.meta.date < b.meta.date ? 1 : -1));
     }
+    // 0 rows for this locale. Distinguish "database never seeded" from
+    // "seeded but this locale was emptied via admin": an unseeded DB falls
+    // back to the static catalogue (launch-safe); a seeded DB is the source
+    // of truth, so an emptied locale stays empty (deletes are trusted).
+    const anywhere = await db
+      .select({ slug: articles.slug })
+      .from(articles)
+      .limit(1);
+    if (anywhere.length > 0) return [];
   } catch {
-    fallback = true;
+    // DB unreachable/error → static fallback below keeps the site up.
   }
-
-  if (!fallback) return [];
   // Static MDX fallback (seed source, never the live source of truth).
   return getStaticSlugs(locale)
     .map((slug) => {

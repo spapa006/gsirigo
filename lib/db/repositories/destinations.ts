@@ -59,6 +59,14 @@ export async function getAllDestinations(locale: string): Promise<ManagedDestina
           localized: rowToLocalized(r),
         }));
     }
+    // Mirrors getAllArticles: an unseeded DB falls back to the static
+    // catalogue; a seeded DB is the source of truth, so a locale emptied via
+    // admin stays empty (deletes are trusted).
+    const anywhere = await db
+      .select({ slug: destinations.slug })
+      .from(destinations)
+      .limit(1);
+    if (anywhere.length > 0) return [];
   } catch {
     // fall through to static
   }

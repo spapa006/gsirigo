@@ -1,7 +1,4 @@
-'use client';
-
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const LOCALES = [
@@ -20,18 +17,14 @@ export function LocaleTabs({
   /** e.g. /admin/articles/my-slug */
   baseHref: string;
 }) {
-  const searchParams = useSearchParams();
-  const other = new URLSearchParams(searchParams);
-
   return (
     <div className="flex flex-wrap gap-1.5">
       {LOCALES.map((l) => {
-        other.set('locale', l.id);
         const active = locale === l.id;
         return (
           <Link
             key={l.id}
-            href={`${baseHref}?${other.toString()}`}
+            href={`${baseHref}?locale=${l.id}`}
             className={cn(
               'rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors',
               active
