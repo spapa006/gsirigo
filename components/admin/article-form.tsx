@@ -77,7 +77,7 @@ export function ArticleForm({
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(data.error ?? 'Failed to save article.');
+        setError(data.error ?? `Failed to save article. Server responded ${res.status}.`);
         return;
       }
       if (values.slug) {

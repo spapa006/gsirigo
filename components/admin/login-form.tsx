@@ -25,7 +25,7 @@ export function LoginForm() {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(data.error ?? 'Login failed.');
+        setError(data.error ?? `Login failed. Server responded ${res.status}.`);
         return;
       }
       router.push('/admin/dashboard');

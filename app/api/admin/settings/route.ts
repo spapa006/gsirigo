@@ -5,6 +5,9 @@ import { revalidateSiteWide } from '@/lib/revalidate';
 import { serverErrorResponse } from '@/lib/api/error-response';
 
 export const runtime = 'nodejs';
+// Cold-start + remote Turso handshake can exceed the 10s Hobby default on the
+// first write; raise the cap so writes don't end up as opaque 504s.
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const auth = await requireAdmin(request);

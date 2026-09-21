@@ -68,13 +68,13 @@ export function PartnerForm({
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(data.error ?? 'Failed to save partner.');
+        setError(data.error ?? `Failed to save partner. Server responded ${res.status}.`);
         return;
       }
       setNotice('Saved. Public widgets revalidated.');
       router.refresh();
     } catch {
-      setError('Failed to save partner.');
+      setError('Failed to save partner. Check your connection and try again.');
     } finally {
       setBusy(false);
     }

@@ -56,7 +56,7 @@ export function RedirectForm({
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(data.error ?? 'Failed to save redirect.');
+        setError(data.error ?? `Failed to save redirect. Server responded ${res.status}.`);
         return;
       }
       if (values.slug) {
@@ -67,7 +67,7 @@ export function RedirectForm({
       setNotice('Saved.');
       router.refresh();
     } catch {
-      setError('Failed to save redirect.');
+      setError('Failed to save redirect. Check your connection and try again.');
     } finally {
       setBusy(false);
     }

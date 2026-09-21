@@ -48,13 +48,13 @@ export function SettingsForm({ initial }: { initial: Record<string, string> }) {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(data.error ?? 'Failed to save settings.');
+        setError(data.error ?? `Failed to save settings. Server responded ${res.status}.`);
         return;
       }
       setNotice('Settings saved. Public pages revalidated.');
       router.refresh();
     } catch {
-      setError('Failed to save settings.');
+      setError('Failed to save settings. Check your connection and try again.');
     } finally {
       setBusy(false);
     }

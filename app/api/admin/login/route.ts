@@ -4,6 +4,9 @@ import { checkRateLimit, resetRateLimit } from '@/lib/auth/rate-limit';
 import { createSessionCookie } from '@/lib/auth/session';
 
 export const runtime = 'nodejs';
+// bcrypt verify + rate-limit bookkeeping can run long on a cold start; give
+// login the same raised cap as the admin write routes.
+export const maxDuration = 60;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

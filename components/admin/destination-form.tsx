@@ -70,7 +70,7 @@ export function DestinationForm({
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setError(data.error ?? 'Failed to save destination.');
+        setError(data.error ?? `Failed to save destination. Server responded ${res.status}.`);
         return;
       }
       if (values.slug) {
@@ -81,7 +81,7 @@ export function DestinationForm({
       setNotice('Saved. Revalidating public pages…');
       router.refresh();
     } catch {
-      setError('Failed to save destination.');
+      setError('Failed to save destination. Check your connection and try again.');
     } finally {
       setBusy(false);
     }
