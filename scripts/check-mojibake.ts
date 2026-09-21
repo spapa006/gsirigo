@@ -1,12 +1,12 @@
 /**
- * Fails the build/lint when any scanned locale file contains Arabic UTF-8
+ * Fails the build/lint when any scanned locale file contains UTF-8
  * mojibake (catches the corruption before it reaches the DB via db:seed).
  *
  *   npm run check:mojibake
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { healArabicMojibake, looksLikeArabicMojibake } from '@/lib/encoding/mojibake';
+import { healMojibake, looksLikeMojibake } from '@/lib/encoding/mojibake';
 
 const ROOTS = ['content', 'messages', 'lib'];
 const TEXT_EXTENSIONS = new Set(['.mdx', '.md', '.json', '.ts', '.tsx']);
@@ -41,16 +41,16 @@ for (const root of ROOTS) {
     } catch {
       continue;
     }
-    if (!looksLikeArabicMojibake(raw)) continue;
-    if (healArabicMojibake(stripBom(raw)) !== null) corrupted.push(file);
+    if (!looksLikeMojibake(raw)) continue;
+    if (healMojibake(stripBom(raw)) !== null) corrupted.push(file);
   }
 }
 
 if (corrupted.length > 0) {
-  console.error(`✗ Arabic mojibake detected in ${corrupted.length} file(s):`);
+  console.error(`✗ text mojibake detected in ${corrupted.length} file(s):`);
   for (const file of corrupted) console.error(`   - ${file}`);
   console.error(`\nRun: npm run repair:mojibake -- --apply`);
   process.exit(1);
 }
 
-console.log('✓ No Arabic mojibake in locale files.');
+console.log('✓ No text mojibake in locale files.');

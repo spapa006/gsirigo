@@ -1,5 +1,5 @@
 /**
- * Scan for — and optionally fix — Arabic UTF-8 mojibake in locale content
+ * Scan for — and optionally fix — UTF-8 mojibake in locale content
  * files (MDX/articles, JSON messages, TS catalogs).
  *
  *   npm run repair:mojibake            # dry run: report what would change
@@ -10,7 +10,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { healArabicMojibake, looksLikeArabicMojibake } from '@/lib/encoding/mojibake';
+import { healMojibake, looksLikeMojibake } from '@/lib/encoding/mojibake';
 
 const APPLY = process.argv.includes('--apply');
 const argRoots = process.argv.slice(2).filter((arg) => arg !== '--apply');
@@ -52,19 +52,19 @@ for (const root of ROOTS) {
     } catch {
       continue;
     }
-    if (!looksLikeArabicMojibake(raw)) continue;
+    if (!looksLikeMojibake(raw)) continue;
     const hadBom = raw.charCodeAt(0) === 0xfeff;
-    const healed = healArabicMojibake(stripBom(raw));
+    const healed = healMojibake(stripBom(raw));
     if (healed !== null) findings.push({ file, healed, hadBom });
   }
 }
 
 if (findings.length === 0) {
-  console.log('✓ No Arabic mojibake found in scanned files.');
+  console.log('✓ No text mojibake found in scanned files.');
   process.exit(0);
 }
 
-console.log(`Found ${findings.length} file(s) with Arabic mojibake:\n`);
+console.log(`Found ${findings.length} file(s) with text mojibake:\n`);
 for (const { file, healed } of findings) {
   const beforeTitle = rawTitle(file);
   const afterTitle = healed

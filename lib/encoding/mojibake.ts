@@ -1,16 +1,25 @@
 /**
- * Helpers to detect and reverse Arabic text-encoding corruption (UTF-8
- * "mojibake"): the UTF-8 bytes of proper Arabic were at some point interpreted
- * as legacy windows-1252 characters and re-saved as UTF-8 (a double encoding).
- * The public site, the admin UI, and Turso all end up storing/showing the
- * garbled forms like "ØªØ£Ø¬ÙŠØ±".
+ * Helpers to detect and reverse text-encoding corruption (UTF-8 "mojibake"):
+ * the UTF-8 bytes of proper text (Arabic or European accented letters) were
+ * at some point interpreted as legacy windows-1252 characters and re-saved as
+ * UTF-8 (a double encoding). The public site, the admin UI, and Turso all end
+ * up storing/showing the garbled forms like "ØªØ£Ø¬ÙŠØ±" (Arabic) or
+ * "chÃ¨res"/"CÃ³mo" (French/Spanish accents).
  *
  * Reversing requires a windows-1252 → byte mapping (NOT plain Latin-1): cp1252
  * positions such as 0x8A ('Š' U+0160), 0x94 ('"' U+201D) etc. are re-mapped to
  * their original bytes before decoding the byte stream as UTF-8.
  *
- * Real-world sample healed by this module:
+ * Real-world samples healed by this module:
  *   "ØªØ£Ø¬ÙŠØ± Ø³ÙŠØ§Ø±Ø§Øª …"  →  "تأجير سيارات …"
+ *   "moins chÃ¨res en 2026"     →  "moins chères en 2026"
+ *   "CÃ³mo ahorrar"             →  "Cómo ahorrar"
+ *
+ * Healing is conservative: the input is only rewritten when the transformed
+ * result is valid UTF-8 (no U+FFFD), differs from the input, and contains
+ * non-ASCII characters (Arabic or accented Latin). Legitimate accented text
+ * (e.g. French "Âge du conducteur", guillemets, em dashes) fails those checks
+ * and is left untouched.
  */
 
 /** windows-1252 bytes that differ from Latin-1 (byte → single char). */
@@ -29,6 +38,14 @@ for (const [byte, char] of Object.entries(CP1252_TO_CHAR)) {
 }
 
 const ARABIC = /[\u0600-\u06FF]/;
+const NON_ASCII = /[^\x00-\x7F]/;
+
+/**
+ * Marker characters that indicate a file may contain mojibake: Latin-1
+ * accented letters (U+00C0–U+00FF) and the cp1252 specials. Used only as a
+ * cheap pre-filter before the strict heal() check.
+ */
+const MARKERS = /[\u00c0-\u00ff\u0160\u0161\u017d\u017e\u0152\u0153\u2018-\u201d\u2013\u2014\u2026\u2039\u203a\u2030\u02c6\u02dc\u2122\u0192\u2020\u2021\u20ac]/;
 
 /** Encode a mojibake string back into its original bytes (cp1252 semantics). */
 export function cp1252ToBytes(input: string): number[] {
@@ -55,27 +72,30 @@ export function cp1252ToBytes(input: string): number[] {
 /**
  * Reverse a UTF-8 → windows-1252 → UTF-8 double-encoding.
  *
- * Returns the healed Arabic string ONLY when the input is real mojibake —
- * i.e. the healed result contains Arabic, contains no U+FFFD replacement
- * chars, and differs from the input. Returns null for anything else (already
- * correct, empty, non-Arabic, or not recoverable) so callers can keep the
- * original value untouched.
+ * Returns the healed string ONLY when the input is real mojibake whose healed
+ * form is valid Arabic or accented Latin (no U+FFFD replacement chars).
+ * Returns null for anything else (already correct, empty, non-mojibake, or not
+ * recoverable) so callers can keep the original value untouched.
  */
-export function healArabicMojibake(input: string): string | null {
+export function healMojibake(input: string): string | null {
   if (!input) return null;
+  if (!NON_ASCII.test(input)) return null; // pure ASCII can't be double-encoded
   if (ARABIC.test(input)) return null; // already proper Arabic (or mixed) — leave alone
   const healed = Buffer.from(cp1252ToBytes(input)).toString('utf8');
   if (healed === input) return null;
   if (healed.includes('\ufffd')) return null;
-  if (!ARABIC.test(healed)) return null;
+  if (!NON_ASCII.test(healed)) return null; // healed must carry real non-ASCII (Arabic/accent)
   return healed;
 }
 
-/** True when the string shows the classic Arabic-mojibake marker characters. */
-export function looksLikeArabicMojibake(input: string): boolean {
+/** Backwards-compatible alias (Arabic was the first supported case). */
+export const healArabicMojibake = healMojibake;
+
+/** True when the string shows a character set that may contain mojibake. */
+export function looksLikeMojibake(input: string): boolean {
   if (!input || ARABIC.test(input)) return false;
-  // Latin-1 accented letters (U+00C0–U+00FF) / cp1252 specials mark the pattern.
-  return /[\u00c0-\u00ff\u0160\u0161\u017d\u017e\u0152\u0153\u2018-\u201d\u2013\u2014\u2026\u2039\u203a\u2030\u02c6\u02dc\u2122\u0192\u2020\u2021\u20ac]/.test(
-    input,
-  );
+  return MARKERS.test(input);
 }
+
+/** Backwards-compatible alias. */
+export const looksLikeArabicMojibake = looksLikeMojibake;

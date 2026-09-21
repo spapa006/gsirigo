@@ -14,17 +14,18 @@ import { ensureTables } from '@/lib/db/client';
 import { getArticleMeta, getArticleSlugs, getArticleSource } from '@/lib/content';
 import { destinations as staticDestinations } from '@/lib/destinations';
 import { PARTNERS, type PartnerId } from '@/lib/partners';
-import { healArabicMojibake } from '@/lib/encoding/mojibake';
+import { healMojibake } from '@/lib/encoding/mojibake';
 
 const LOCALES = ['en', 'fr', 'es', 'ar'] as const;
 const force = process.argv.includes('--force');
 
 /**
  * Safety net against ever re-corrupting the DB from a bad source file: if a
- * static string is Arabic-mojibake (e.g. "ØªØ£Ø¬ÙŠØ± …"), heal it before the
- * write. Proper Arabic, Latin text and everything else pass through untouched.
+ * static string is UTF-8 mojibake (e.g. "ØªØ£Ø¬ÙŠØ± …" or "chÃ¨res"), heal it
+ * before the write. Proper Arabic, accented Latin and other text pass through
+ * untouched.
  */
-const heal = (value: string) => healArabicMojibake(value) ?? value;
+const heal = (value: string) => healMojibake(value) ?? value;
 
 async function seedArticles() {
   const { countArticles, saveArticle } = await import('@/lib/db/repositories/articles');
