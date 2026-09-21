@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import Script from 'next/script';
 import { Inter, Noto_Sans_Arabic } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
@@ -9,6 +10,19 @@ import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { Analytics } from '@/components/analytics';
 import '../globals.css';
+
+/**
+ * Travelpayouts Drive tracking — loaded in <head> on every public page via
+ * next/script (beforeInteractive injects it before hydration). The original
+ * snippet is a WordPress-style wrapper; only the inner loader is needed here.
+ */
+const DRIVE_SNIPPET = `(function () {
+  var script = document.createElement("script");
+  script.async = 1;
+  script.setAttribute("data-cmp-ab","2");
+  script.src = 'https://tp-em.com/NTc2Mzk1.js?t=576395';
+  document.head.appendChild(script);
+})();`;
 
 const inter = Inter({
   subsets: ['latin'],
@@ -59,6 +73,11 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body>
+        <Script
+          id="tp-drive"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: DRIVE_SNIPPET }}
+        />
         <NextIntlClientProvider messages={messages}>
           <div className="flex min-h-screen flex-col">
             <SiteHeader />

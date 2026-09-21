@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import Script from 'next/script';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Inter } from 'next/font/google';
@@ -7,6 +8,18 @@ import { getServerSession } from '@/lib/auth/session';
 import { AdminNav } from '@/components/admin/admin-nav';
 import { LogoutButton } from '@/components/admin/logout-button';
 import '../../globals.css';
+
+/**
+ * Travelpayouts Drive tracking — loaded in <head> (beforeInteractive) to match
+ * the "every page" placement requirement.
+ */
+const DRIVE_SNIPPET = `(function () {
+  var script = document.createElement("script");
+  script.async = 1;
+  script.setAttribute("data-cmp-ab","2");
+  script.src = 'https://tp-em.com/NTc2Mzk1.js?t=576395';
+  document.head.appendChild(script);
+})();`;
 
 const inter = Inter({
   subsets: ['latin'],
@@ -38,6 +51,11 @@ export default async function AdminDashboardLayout({
   return (
     <html lang="en" dir="ltr" className={inter.variable}>
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+        <Script
+          id="tp-drive"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: DRIVE_SNIPPET }}
+        />
         <div className="flex min-h-screen">
           <AdminNav />
           <div className="flex min-w-0 flex-1 flex-col">
