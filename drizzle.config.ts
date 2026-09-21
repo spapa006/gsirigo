@@ -13,8 +13,12 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'turso',
   dbCredentials: {
-    url: process.env.LIBSQL_URL ?? process.env.DATABASE_URL ?? 'file:./data/gsirigo.db',
-    authToken: process.env.LIBSQL_AUTH_TOKEN,
+    url:
+      process.env.TURSO_DATABASE_URL ??
+      process.env.LIBSQL_URL ??
+      process.env.DATABASE_URL ??
+      'file:./data/gsirigo.db',
+    authToken: process.env.TURSO_AUTH_TOKEN ?? process.env.LIBSQL_AUTH_TOKEN,
   },
   verbose: true,
   strict: true,

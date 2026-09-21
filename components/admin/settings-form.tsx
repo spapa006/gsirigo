@@ -109,8 +109,9 @@ export function SettingsForm({ initial }: { initial: Record<string, string> }) {
         Values saved in the database override build-time environment variables.
         For server-side secrets (<code className="font-mono">AUTH_SECRET</code>,{' '}
         <code className="font-mono">ADMIN_PASSWORD_HASH</code>,{' '}
-        <code className="font-mono">LIBSQL_URL</code>) keep using the Vercel env
-        var panel — never store secrets in these site settings.
+        <code className="font-mono">TURSO_DATABASE_URL</code> /{' '}
+        <code className="font-mono">TURSO_AUTH_TOKEN</code>) keep using the
+        Vercel env var panel — never store secrets in these site settings.
       </div>
 
       <Button type="button" onClick={handleSave} disabled={busy}>

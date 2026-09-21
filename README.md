@@ -68,8 +68,8 @@ Saving any content revalidates the affected public pages on demand (ISR stays fa
 The database is the **source of truth** at runtime. The static MDX files are the one-time seed source and a safe fallback when the DB is empty/unreachable (so the first `next build` stays green pre-seed).
 
 - **Local dev (default):** zero-config SQLite file at `./data/gsirigo.db`, created on first boot (tables are bootstrapped via `CREATE TABLE IF NOT EXISTS` from `lib/db/migrations.ts`, kept in sync with `db/schema.ts`).
-- **Production (Vercel):** any libsql server such as [Turso](https://turso.tech). Create a database, then set `LIBSQL_URL=libsql://<database>.turso.io?tls=1` + `LIBSQL_AUTH_TOKEN`. Once pointed at the remote DB, run `npm run db:seed` once (from your machine, with those env vars set) to import the 40 articles, 24 destinations and 12 partner entries.
-- `DATABASE_URL` is accepted as an alias for `LIBSQL_URL` (set either, not both).
+- **Production (Vercel):** any libsql server such as [Turso](https://turso.tech). The Vercel **Turso Marketplace integration** creates the database and sets `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` automatically. Manual setup: create a database, then set `TURSO_DATABASE_URL=libsql://<database>-<org>.turso.io` + `TURSO_AUTH_TOKEN` (or the equivalent `LIBSQL_URL` / `LIBSQL_AUTH_TOKEN`). Once pointed at the remote DB, run `npm run db:seed` once (from your machine, with those env vars set) to import the 40 articles, 24 destinations and 12 partner entries.
+- Precedence: `TURSO_DATABASE_URL` > `LIBSQL_URL` > `DATABASE_URL` for the URL, and `TURSO_AUTH_TOKEN` > `LIBSQL_AUTH_TOKEN` for the token (set one pair, not both).
 
 Schema (see `db/schema.ts`): `articles (slug, locale)` · `destinations (slug, locale)` · `partners (id, locale)` · `site_settings (key)` · `redirect_links (slug)` · `redirect_clicks (id)`. `drizzle.config.ts` is a convenience for `drizzle-kit`; runtime migrations are the idempotent bootstraps above.
 
@@ -83,8 +83,8 @@ Copy `.env.example` → `.env.local` for local development (`.env*.local` is git
 | `ADMIN_EMAIL` | Admin login email | **yes** (prod) |
 | `ADMIN_PASSWORD_HASH` | Escaped bcrypt hash of the admin password (see note above) | **yes** (prod) |
 | `AUTH_SECRET` | Session-cookie signing secret (32+ chars) | **yes** (prod) |
-| `LIBSQL_URL` / `DATABASE_URL` | Remote libsql/Turso URL; local `file:` DB used when unset | **yes** (prod) |
-| `LIBSQL_AUTH_TOKEN` | Turso auth token (only needed for remote DBs) | prod (Turso) |
+| `TURSO_DATABASE_URL` / `LIBSQL_URL` / `DATABASE_URL` | Remote libsql/Turso URL (integration name first); local `file:` DB used when unset | **yes** (prod) |
+| `TURSO_AUTH_TOKEN` / `LIBSQL_AUTH_TOKEN` | Turso auth token (only needed for remote DBs) | prod (Turso) |
 | `NEXT_PUBLIC_GA_ID` | GA4 measurement ID — analytics stays disabled when empty | optional |
 | `NEXT_PUBLIC_TRAVELPAYOUTS_MARKER` | Default attribution marker for draft widget links | optional |
 | `NEXT_PUBLIC_TRAVELPAYOUTS_SUB_ID` | Default `sub_id` for draft widget links | optional |
@@ -141,13 +141,13 @@ Destination cards, destination pages and article heroes use free-to-use Unsplash
 
 1. Push this repo to GitHub.
 2. In Vercel: **New Project → Import** the repo. Framework preset **Next.js** is auto-detected — no build overrides needed (`npm run build` / `npm start` are standard).
-3. Create a [Turso](https://turso.tech) database and note `LIBSQL_URL` + `LIBSQL_AUTH_TOKEN`.
+3. Link your [Turso](https://turso.tech) database via the Vercel **Marketplace → Turso integration** (creates `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` automatically), or create one manually and note those two values.
 4. Add these environment variables in the Vercel project dashboard (both Preview and Production if you want the admin to work on previews):
    - `NEXT_PUBLIC_SITE_URL` → `https://gsirigo.com` (or your Vercel URL)
    - `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_TRAVELPAYOUTS_MARKER`, `NEXT_PUBLIC_TRAVELPAYOUTS_SUB_ID` (optional)
    - `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` (escaped bcrypt form), `AUTH_SECRET`
-   - `LIBSQL_URL` + `LIBSQL_AUTH_TOKEN` (or `DATABASE_URL`)
-5. Deploy, then run once from your machine (with the same `LIBSQL_URL`/`LIBSQL_AUTH_TOKEN`): `npm run db:seed`.
+   - `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` (integration adds these; manual setup may use `LIBSQL_URL` / `LIBSQL_AUTH_TOKEN` instead)
+5. Deploy, then run once from your machine (with the same DB URL/token env vars): `npm run db:seed`.
 6. Log in at `/admin` and paste your real Travelpayouts embeds into **Partners**, then set your GA/settings.
 
 ### Deployment checks after first deploy

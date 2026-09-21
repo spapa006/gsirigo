@@ -20,7 +20,7 @@ const DB_URL = process.env.E2E_DB_URL ?? 'file:data/gsirigo.db';
 const db = createClient({
   url: DB_URL,
   // Needed when E2E_DB_URL points at a remote Turso DB (LIBSQL_URL).
-  authToken: process.env.LIBSQL_AUTH_TOKEN,
+  authToken: process.env.TURSO_AUTH_TOKEN ?? process.env.LIBSQL_AUTH_TOKEN,
 });
 const TS = Date.now().toString(36);
 

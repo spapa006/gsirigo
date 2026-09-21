@@ -7,7 +7,8 @@
  *   npm run db:seed            # imports only tables that are empty
  *   npm run db:seed -- --force # re-import everything (upsert)
  *
- * Set LIBSQL_URL / LIBSQL_AUTH_TOKEN to seed a remote (Turso) DB.
+ * Set TURSO_DATABASE_URL / TURSO_AUTH_TOKEN (or LIBSQL_URL / LIBSQL_AUTH_TOKEN)
+ * to seed a remote (Turso) DB.
  */
 import { ensureTables } from '@/lib/db/client';
 import { getArticleMeta, getArticleSlugs, getArticleSource } from '@/lib/content';
