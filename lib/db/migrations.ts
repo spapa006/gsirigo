@@ -1,3 +1,5 @@
+import type { Client } from '@libsql/client';
+
 /**
  * Bootstrap SQL for the Gsirigo SQLite (libsql) database.
  *
@@ -82,12 +84,85 @@ export const MIGRATION_STATEMENTS: string[] = [
   )`,
 
   `CREATE TABLE IF NOT EXISTS redirect_clicks (
-    id TEXT NOT NULL,
-    slug TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL REFERENCES redirect_links(slug),
     clicked_at INTEGER NOT NULL,
-    PRIMARY KEY (id)
+    ip_hash TEXT,
+    country TEXT,
+    city TEXT,
+    device_type TEXT,
+    browser TEXT,
+    os TEXT,
+    referrer TEXT,
+    locale TEXT,
+    is_bot INTEGER NOT NULL DEFAULT 0,
+    user_agent TEXT
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS redirect_click_rollups (
+    slug TEXT NOT NULL REFERENCES redirect_links(slug),
+    month TEXT NOT NULL,
+    clicks INTEGER NOT NULL DEFAULT 0,
+    bot_clicks INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (slug, month)
   )`,
 
   `CREATE INDEX IF NOT EXISTS idx_redirect_clicks_slug ON redirect_clicks (slug, clicked_at)`,
+  `CREATE INDEX IF NOT EXISTS idx_redirect_clicks_clicked_at ON redirect_clicks (clicked_at)`,
   `CREATE INDEX IF NOT EXISTS idx_articles_locale_status ON articles (locale, status)`,
 ];
+
+/**
+ * Rename the original uuid-log `redirect_clicks` (id/slug/clicked_at only) so
+ * the CREATE TABLE IF NOT EXISTS above can build the event-shaped table, and
+ * drop the old index whose name the new table needs.
+ *
+ * Returns true when a legacy table was found and renamed; the caller then
+ * runs MIGRATION_STATEMENTS and finally copies + drops the legacy rows
+ * (see copyLegacyRedirectClicks). Split around the statements because plain
+ * CREATE TABLE IF NOT EXISTS cannot alter an existing table's shape.
+ *
+ * Race-tolerant: if a concurrent instance already migrated, the rename throws
+ * and we simply report "nothing to do".
+ */
+export async function renameLegacyRedirectClicks(client: Client): Promise<boolean> {
+  const info = await client.execute(`PRAGMA table_info(redirect_clicks)`);
+  const columns = info.rows.map((row) => String(row.name ?? ''));
+  // Empty → table does not exist yet (fresh bootstrap). Has ip_hash → already
+  // the new event shape. Otherwise it is the legacy uuid log.
+  if (columns.length === 0 || columns.includes('ip_hash')) return false;
+  try {
+    await client.execute(
+      `ALTER TABLE redirect_clicks RENAME TO redirect_clicks_legacy`
+    );
+    await client.execute(`DROP INDEX IF EXISTS idx_redirect_clicks_slug`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Preserve legacy click history: copy (slug, clicked_at) into the new table —
+ * everything else was never captured. Legacy rows become is_bot = 0 so the
+ * historical `redirect_links.click_count` (which counted every legacy click)
+ * keeps matching COUNT(*) WHERE is_bot = 0.
+ *
+ * Runs as one write-transaction batch so two concurrent instances can never
+ * double-copy. If the legacy table is already gone, the batch fails and is
+ * swallowed — history was copied by the winner.
+ */
+export async function copyLegacyRedirectClicks(client: Client): Promise<void> {
+  try {
+    await client.batch(
+      [
+        `INSERT INTO redirect_clicks (slug, clicked_at)
+         SELECT slug, clicked_at FROM redirect_clicks_legacy`,
+        `DROP TABLE redirect_clicks_legacy`,
+      ],
+      'write'
+    );
+  } catch {
+    // No legacy table (fresh DB, or a concurrent instance migrated first).
+  }
+}

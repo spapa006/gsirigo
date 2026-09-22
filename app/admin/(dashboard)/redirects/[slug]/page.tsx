@@ -32,9 +32,17 @@ export default async function EditRedirectPage({ params }: Props) {
             /go/{slug} — {link.clickCount} click{link.clickCount === 1 ? '' : 's'} tracked
           </p>
         </div>
-        <Link href="/admin/redirects" className="text-sm font-medium text-teal-700 hover:underline">
-          ← Back to redirects
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/admin/redirects/${slug}/analytics`}
+            className="text-sm font-medium text-teal-700 hover:underline"
+          >
+            View analytics →
+          </Link>
+          <Link href="/admin/redirects" className="text-sm font-medium text-teal-700 hover:underline">
+            ← Back to redirects
+          </Link>
+        </div>
       </header>
 
       <div className="rounded-2xl border bg-white p-6 shadow-sm">

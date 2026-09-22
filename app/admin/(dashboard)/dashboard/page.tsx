@@ -38,7 +38,7 @@ export default async function AdminDashboardPage() {
         <StatCard label="Destinations" value={destinationCount} hint="across 4 locales" />
         <StatCard label="Partners" value={partnerCount} hint="across 4 locales" />
         <StatCard label="Redirect links" value={linkCount} hint="/go/… cloaked URLs" />
-        <StatCard label="Clicks (30 days)" value={clicks30d} hint="tracked redirects" />
+        <StatCard label="Clicks (30 days)" value={clicks30d} hint="human clicks, bots excluded" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -61,6 +61,8 @@ export default async function AdminDashboardPage() {
                     /go/{click.slug}
                   </code>
                   <span className="text-xs text-muted-foreground">
+                    {click.country ? `${click.country} · ` : ''}
+                    {click.deviceType ? `${click.deviceType} · ` : ''}
                     {click.clickedAt.toISOString().replace('T', ' ').slice(0, 19)}
                   </span>
                 </li>

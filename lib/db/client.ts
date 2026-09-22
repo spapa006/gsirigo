@@ -3,7 +3,11 @@ import path from 'node:path';
 import { createClient, type Client } from '@libsql/client';
 import { drizzle, type LibSQLDatabase } from 'drizzle-orm/libsql';
 import * as schema from '@/db/schema';
-import { MIGRATION_STATEMENTS } from '@/lib/db/migrations';
+import {
+  MIGRATION_STATEMENTS,
+  renameLegacyRedirectClicks,
+  copyLegacyRedirectClicks,
+} from '@/lib/db/migrations';
 
 /**
  * Gsirigo database connection.
@@ -81,9 +85,16 @@ export function ensureTables(): Promise<void> {
   if (_migrating) return _migrating;
   _migrating = (async () => {
     const client = getClient();
+    // The pre-analytics deploy shipped `redirect_clicks` as a uuid log
+    // (id/slug/clicked_at only). CREATE TABLE IF NOT EXISTS can't change an
+    // existing table's shape, so the legacy table is renamed first, the new
+    // event-shaped table is created by the statements below, then legacy rows
+    // are copied across and the old table dropped.
+    await renameLegacyRedirectClicks(client);
     for (const statement of MIGRATION_STATEMENTS) {
       await client.execute(statement);
     }
+    await copyLegacyRedirectClicks(client);
     _migrating = null;
   })().catch((error) => {
     _migrating = null;

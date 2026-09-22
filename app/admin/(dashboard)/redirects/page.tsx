@@ -74,12 +74,20 @@ export default async function AdminRedirectsPage() {
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/admin/redirects/${link.slug}`}
-                      className="text-xs font-semibold text-teal-700 hover:underline"
-                    >
-                      Edit →
-                    </Link>
+                    <div className="flex items-center justify-end gap-3">
+                      <Link
+                        href={`/admin/redirects/${link.slug}/analytics`}
+                        className="text-xs font-semibold text-slate-500 hover:text-teal-700 hover:underline"
+                      >
+                        Analytics →
+                      </Link>
+                      <Link
+                        href={`/admin/redirects/${link.slug}`}
+                        className="text-xs font-semibold text-teal-700 hover:underline"
+                      >
+                        Edit →
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}

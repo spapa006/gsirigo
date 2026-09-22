@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { after } from 'next/server';
 import { getRedirectLink, recordClick } from '@/lib/db/repositories/redirects';
+import { buildClickEvent } from '@/lib/analytics/click-event';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,11 +18,13 @@ export const dynamic = 'force-dynamic';
 /**
  * Public cloaked affiliate link: /go/dubai-rentalcars
  *
- * - Found + active  → increment clicks (async, non-blocking) → 302
+ * - Found + active  → capture a full click event (geo, device, referrer,
+ *                     locale, bot flag) then background-write it with
+ *                     `after()` → 302 (never blocked by the DB write)
  * - Missing/inactive → redirect to the homepage
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await context.params;
@@ -37,13 +40,17 @@ export async function GET(
   }
 
   if (!destinationUrl) {
-    return NextResponse.redirect(new URL('/', new URL(_request.url).origin));
+    return NextResponse.redirect(new URL('/', new URL(request.url).origin));
   }
 
-  // Fire the click increment AFTER the redirect response is sent; failures
-  // are swallowed so analytics can never break a redirect.
+  // Capture geo/device/referrer/client info server-side BEFORE the redirect:
+  // pure synchronous header parsing, no I/O, no added latency.
+  const event = buildClickEvent(request);
+
+  // Fire the detailed analytics write AFTER the redirect response is sent;
+  // failures are swallowed so analytics can never break a redirect.
   after(() => {
-    void recordClick(slug).catch(() => {});
+    void recordClick(slug, event).catch(() => {});
   });
 
   return NextResponse.redirect(destinationUrl, 302);

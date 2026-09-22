@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
 
 /* ------------------------------- Articles -------------------------------- */
 // PK = (slug, locale): an article exists once per locale (DDL in
@@ -93,12 +93,46 @@ export const redirectLinks = sqliteTable('redirect_links', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 
-/** One row per click, used for the "clicks last 30 days" dashboard chart. */
+/** One row per click event (analytics source of truth; click_count on
+ * redirect_links stays as the denormalized fast counter). DDL in
+ * lib/db/migrations.ts, kept in sync manually. */
 export const redirectClicks = sqliteTable('redirect_clicks', {
-  id: text('id').notNull(), // uuid
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  /** FK → redirect_links.slug (that table's PK). */
   slug: text('slug').notNull(),
+  /** Unix seconds UTC (drizzle mode 'timestamp'). */
   clickedAt: integer('clicked_at', { mode: 'timestamp' }).notNull(),
+  /** SHA-256 of the client IP (peppered) — raw IPs are never stored. */
+  ipHash: text('ip_hash'),
+  /** ISO country code from Vercel geo headers (x-vercel-ip-country). */
+  country: text('country'),
+  city: text('city'),
+  /** mobile | desktop | tablet (from UA parsing). */
+  deviceType: text('device_type'),
+  browser: text('browser'),
+  os: text('os'),
+  /** Site path (same-host) or host+path (external); null = direct. */
+  referrer: text('referrer'),
+  /** Site locale at click time (en | fr | es | ar). */
+  locale: text('locale'),
+  /** Bot/crawler traffic — kept in the table but excluded from headline stats. */
+  isBot: integer('is_bot', { mode: 'boolean' }).notNull().default(false),
+  userAgent: text('user_agent'),
 });
+
+/** Monthly aggregates for raw events older than the retention window. */
+export const redirectClickRollups = sqliteTable(
+  'redirect_click_rollups',
+  {
+    slug: text('slug').notNull(),
+    /** 'YYYY-MM' (UTC month of clicked_at). */
+    month: text('month').notNull(),
+    /** Non-bot clicks archived in this month. */
+    clicks: integer('clicks').notNull().default(0),
+    botClicks: integer('bot_clicks').notNull().default(0),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.slug, t.month] }) })
+);
 
 /* --------------------------------- Types ---------------------------------- */
 
@@ -111,3 +145,5 @@ export type NewPartnerRow = typeof partners.$inferInsert;
 export type SiteSettingRow = typeof siteSettings.$inferSelect;
 export type RedirectLinkRow = typeof redirectLinks.$inferSelect;
 export type NewRedirectLinkRow = typeof redirectLinks.$inferInsert;
+export type RedirectClickRow = typeof redirectClicks.$inferSelect;
+export type NewRedirectClickRow = typeof redirectClicks.$inferInsert;
