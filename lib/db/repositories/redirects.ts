@@ -124,8 +124,10 @@ export async function recordClick(slug: string, event: ClickEvent): Promise<void
         }
       });
     });
-  } catch {
-    // Click tracking is best-effort — never fail the redirect.
+  } catch (error) {
+    // Click tracking is best-effort — never fail the redirect — but the real
+    // error must still surface in the function log for debugging.
+    console.error(`recordClick(${slug}) failed:`, error instanceof Error ? error.message : error);
   }
 }
 
