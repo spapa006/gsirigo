@@ -7,6 +7,7 @@ import {
   MIGRATION_STATEMENTS,
   renameLegacyRedirectClicks,
   copyLegacyRedirectClicks,
+  ensureEventIdColumn,
 } from '@/lib/db/migrations';
 
 /**
@@ -95,6 +96,7 @@ export function ensureTables(): Promise<void> {
       await client.execute(statement);
     }
     await copyLegacyRedirectClicks(client);
+    await ensureEventIdColumn(client);
     _migrating = null;
   })().catch((error) => {
     _migrating = null;

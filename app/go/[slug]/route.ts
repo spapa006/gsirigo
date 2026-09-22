@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { after } from 'next/server';
+import { randomUUID } from 'node:crypto';
 import { getRedirectLink } from '@/lib/db/repositories/redirects';
 import { buildClickEvent } from '@/lib/analytics/click-event';
 
@@ -29,11 +30,15 @@ export const dynamic = 'force-dynamic';
  * responses — some clicks were silently dropped (verified with live marker
  * probes: awaited writes in a normal request handler landed 100%, `after()`
  * writes ~randomly). The write therefore runs inside /api/track — a regular
- * POST handler — where it is awaited and deterministic. The fetch is issued
- * BEFORE the 302 is returned and marked keepalive:true so the runtime flushes
- * it even after the response goes out; `after()` merely extends the function
- * lifetime for the fetch to complete when the runtime honors it. Any dispatch
- * failure is logged but never breaks the redirect.
+ * POST handler — where it is awaited and deterministic.
+ *
+ * Delivery is belt-and-braces: each click gets a unique `eventId` and is
+ * dispatched via BOTH a keepalive fetch (issued before the 302, so the
+ * runtime flushes it even after the response goes out) AND an `after()`
+ * retry carrying the same id. /api/track inserts with ON CONFLICT DO NOTHING,
+ * so the retry that lands second is simply ignored — at-most-once per click
+ * with two independent delivery paths. Any dispatch failure is logged but
+ * never breaks the redirect.
  */
 export async function GET(
   request: Request,
@@ -58,30 +63,40 @@ export async function GET(
   // Capture geo/device/referrer/client info server-side BEFORE the redirect:
   // pure synchronous header parsing, no I/O, no added latency.
   const event = buildClickEvent(request);
+  const eventId = randomUUID();
 
-  // Dispatch the click to the tracking route. Not awaited — the 302 goes out
-  // immediately; keepalive ensures the outbound request is flushed even after
-  // the response is sent.
   const secret = process.env.TRACKING_SECRET?.trim();
-  const trackPromise = fetch(`${new URL(request.url).origin}/api/track`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      ...(secret ? { 'x-track-secret': secret } : {}),
-    },
-    body: JSON.stringify({ slug, event }),
-    keepalive: true,
-  }).catch((error) => {
-    console.error(
-      'track dispatch failed:',
-      error instanceof Error ? error.message : error
-    );
-  });
+  const dispatch = () =>
+    fetch(`${new URL(request.url).origin}/api/track`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        ...(secret ? { 'x-track-secret': secret } : {}),
+      },
+      body: JSON.stringify({ slug, event, eventId }),
+      keepalive: true,
+    }).catch((error) => {
+      console.error(
+        'track dispatch failed:',
+        error instanceof Error ? error.message : error
+      );
+    });
 
-  // Best-effort lifetime extension so the fetch can finish; never awaited, so
-  // it can never delay or break the redirect.
+  // Primary path — dispatched BEFORE the 302 is returned, never awaited, so
+  // the redirect is not blocked and the outbound request is being flushed even
+  // if the function is frozen right after the response goes out.
+  const primary = dispatch();
+
+  // Backup path — if the runtime honors after(), the function stays alive
+  // briefly; a second dispatch with the SAME eventId covers a dropped primary.
+  // Deduped downstream, so at most one row + one counter bump per click.
   after(() => {
-    void trackPromise;
+    void primary;
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        void dispatch().then(() => resolve());
+      }, 1000);
+    });
   });
 
   return NextResponse.redirect(destinationUrl, 302);

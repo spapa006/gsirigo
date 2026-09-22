@@ -69,7 +69,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'bad payload' }, { status: 400 });
   }
 
-  const { slug, event } = payload as { slug?: unknown; event?: unknown };
+  const { slug, event, eventId } = payload as {
+    slug?: unknown;
+    event?: unknown;
+    eventId?: unknown;
+  };
   if (typeof slug !== 'string' || slug.length === 0 || slug.length > MAX_SLUG) {
     return NextResponse.json({ ok: false, error: 'bad slug' }, { status: 400 });
   }
@@ -77,9 +81,16 @@ export async function POST(request: Request) {
   if (!clean) {
     return NextResponse.json({ ok: false, error: 'bad event' }, { status: 400 });
   }
+  // UUIDs are 36 chars; generous bound that still rejects junk payloads.
+  const cleanEventId =
+    typeof eventId === 'string' && eventId.length > 0 && eventId.length <= 64
+      ? eventId
+      : undefined;
 
   // Awaited, deterministic write. recordClick logs on failure and never throws.
-  await recordClick(slug, clean);
+  // With an eventId, duplicates (both /go delivery paths racing) are ignored
+  // by ON CONFLICT DO NOTHING — at-most-once semantics.
+  await recordClick(slug, clean, cleanEventId);
 
   return NextResponse.json({ ok: true });
 }

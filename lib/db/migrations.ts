@@ -87,6 +87,7 @@ export const MIGRATION_STATEMENTS: string[] = [
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slug TEXT NOT NULL REFERENCES redirect_links(slug),
     clicked_at INTEGER NOT NULL,
+    event_id TEXT,
     ip_hash TEXT,
     country TEXT,
     city TEXT,
@@ -140,6 +141,42 @@ export async function renameLegacyRedirectClicks(client: Client): Promise<boolea
   } catch {
     return false;
   }
+}
+
+/**
+ * Add the at-most-once dedup column + unique index to a table that already has
+ * the event shape (i.e. an existing DB deployed between the analytics feature
+ * and event_id) and ensure the unique index exists on every shape (fresh DBs,
+ * legacy-migrated DBs, and altered DBs alike).
+ *
+ * CREATE TABLE IF NOT EXISTS cannot alter an existing table, so this ALTERs
+ * in-place when the column is missing. Idempotent and race-tolerant (PRAGMA
+ * guard; IF NOT EXISTS).
+ */
+export async function ensureEventIdColumn(client: Client): Promise<void> {
+  const info = await client.execute(`PRAGMA table_info(redirect_clicks)`);
+  const columns = info.rows.map((row) => String(row.name ?? ''));
+  if (columns.length === 0) {
+    // Table does not exist yet — it will be created WITH event_id by
+    // MIGRATION_STATEMENTS; index still ensured below.
+    await client.execute(
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_redirect_clicks_event_id
+       ON redirect_clicks (event_id) WHERE event_id IS NOT NULL`
+    );
+    return;
+  }
+  if (!columns.includes('ip_hash')) {
+    // Legacy uuid-only log that renameLegacyRedirectClicks did not migrate
+    // (a concurrent instance is mid-migration) — nothing safe to do here.
+    return;
+  }
+  if (!columns.includes('event_id')) {
+    await client.execute(`ALTER TABLE redirect_clicks ADD COLUMN event_id TEXT`);
+  }
+  await client.execute(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_redirect_clicks_event_id
+     ON redirect_clicks (event_id) WHERE event_id IS NOT NULL`
+  );
 }
 
 /**

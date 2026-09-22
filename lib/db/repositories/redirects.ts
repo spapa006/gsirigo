@@ -97,14 +97,25 @@ export async function deleteRedirect(slug: string): Promise<void> {
  * counter always matches COUNT(*) FROM redirect_clicks WHERE slug = ?
  * AND is_bot = 0 (the verification invariant). Bot events are stored but
  * deliberately excluded.
+ *
+ * When `eventId` is provided the insert uses ON CONFLICT DO NOTHING: the /go
+ * route delivers each click through two independent paths (keepalive fetch +
+ * after() retry) and whichever lands first wins; duplicates are ignored and
+ * only an insert that actually happened bumps the counter. Without `eventId`
+ * (legacy callers) the insert is unconditional.
  */
-export async function recordClick(slug: string, event: ClickEvent): Promise<void> {
+export async function recordClick(
+  slug: string,
+  event: ClickEvent,
+  eventId?: string
+): Promise<void> {
   try {
     await withDb(async (db) => {
       await db.transaction(async (tx) => {
-        await tx.insert(redirectClicks).values({
+        const values = {
           slug,
           clickedAt: new Date(),
+          eventId: eventId ?? null,
           ipHash: event.ipHash,
           country: event.country,
           city: event.city,
@@ -115,8 +126,18 @@ export async function recordClick(slug: string, event: ClickEvent): Promise<void
           locale: event.locale,
           isBot: event.isBot,
           userAgent: event.userAgent,
-        });
-        if (!event.isBot) {
+        };
+        let inserted = true;
+        if (eventId) {
+          const result = await tx
+            .insert(redirectClicks)
+            .values(values)
+            .onConflictDoNothing();
+          inserted = result.rowsAffected > 0;
+        } else {
+          await tx.insert(redirectClicks).values(values);
+        }
+        if (inserted && !event.isBot) {
           await tx
             .update(redirectLinks)
             .set({ clickCount: sql`${redirectLinks.clickCount} + 1` })
