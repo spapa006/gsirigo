@@ -1,18 +1,23 @@
 import { NextResponse } from 'next/server';
 import { after } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import { redirectClicks } from '@/db/schema';
 import { getClient, withDb } from '@/lib/db/client';
 
 /**
  * TEMPORARY diagnostic 2 — REMOVE before shipping.
  *
- *   /api/diag2?m=1
+ *   /api/diag2?m=1            → 200 JSON (control)
+ *   /api/diag2?m=1&mode=redirect → 302 redirect (like /go)
+ *   /api/diag2?m=1&mode=redirect&wu=1 → 302 redirect + waitUntil arm
  *
- * A TX-SYNC     awaited  drizzle db.transaction + insert   (err in response)
- * B PLAIN-SYNC  awaited  drizzle plain insert              (err in response)
- * E RAW-SYNC    awaited  raw client.execute INSERT         (err in response)
+ * A TX-SYNC     awaited  drizzle db.transaction + insert  (err in response)
+ * B PLAIN-SYNC  awaited  drizzle plain insert             (err in response)
+ * E RAW-SYNC    awaited  raw client.execute INSERT        (err in response)
  * F BATCH-SYNC  awaited  raw client.batch([INSERT],'write')(err in response)
- * C TX-AFTER    after()  drizzle db.transaction + insert    (marker row)
+ * C TX-AFTER    after()  drizzle db.transaction + insert   (marker row)
+ * W WU-REDIRECT waitUntil drizzle db.transaction + insert (marker row, only
+ *                                                          with &wu=1)
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,8 +25,11 @@ export const dynamic = 'force-dynamic';
 const now = () => new Date();
 
 export async function GET(request: Request) {
-  const run = new URL(request.url).searchParams.get('m') ?? '1';
-  const res: Record<string, unknown> = { run };
+  const url = new URL(request.url);
+  const run = url.searchParams.get('m') ?? '1';
+  const mode = url.searchParams.get('mode') ?? 'json';
+  const useWu = url.searchParams.get('wu') === '1';
+  const res: Record<string, unknown> = { run, mode };
 
   // A — drizzle transaction, awaited.
   try {
@@ -101,5 +109,38 @@ export async function GET(request: Request) {
     res.batchSyncErr = error instanceof Error ? error.message : String(error);
   }
 
+  // W — waitUntil (only when &wu=1): does it survive a 302 like after()?
+  if (useWu) {
+    waitUntil(
+      withDb(async (db) => {
+        await db.transaction(async (tx) => {
+          await tx.insert(redirectClicks).values({
+            slug: 'alamo',
+            clickedAt: now(),
+            country: `WU-REDIRECT-${run}`,
+            isBot: true,
+            userAgent: `diag2-WU-${run}`,
+          });
+        });
+      }).catch((error) => console.error('diag2 waitUntil failed:', error))
+    );
+    after(() => {
+      withDb(async (db) => {
+        await db.transaction(async (tx) => {
+          await tx.insert(redirectClicks).values({
+            slug: 'alamo',
+            clickedAt: now(),
+            country: `WU-AFTER-${run}`,
+            isBot: true,
+            userAgent: `diag2-WU-AFTER-${run}`,
+          });
+        });
+      }).catch((error) => console.error('diag2 WU-AFTER failed:', error));
+    });
+  }
+
+  if (mode === 'redirect') {
+    return NextResponse.redirect('https://example.com/', 302);
+  }
   return NextResponse.json(res);
 }
