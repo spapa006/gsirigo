@@ -3,6 +3,7 @@ import { after } from 'next/server';
 import { waitUntil } from '@vercel/functions';
 import { redirectClicks } from '@/db/schema';
 import { getClient, withDb } from '@/lib/db/client';
+import { recordClick } from '@/lib/db/repositories/redirects';
 
 /**
  * TEMPORARY diagnostic 2 — REMOVE before shipping.
@@ -111,19 +112,23 @@ export async function GET(request: Request) {
 
   // W — waitUntil (only when &wu=1): does it survive a 302 like after()?
   if (useWu) {
-    waitUntil(
-      withDb(async (db) => {
-        await db.transaction(async (tx) => {
-          await tx.insert(redirectClicks).values({
-            slug: 'alamo',
-            clickedAt: now(),
-            country: `WU-REDIRECT-${run}`,
-            isBot: true,
-            userAgent: `diag2-WU-${run}`,
+    try {
+      waitUntil(
+        withDb(async (db) => {
+          await db.transaction(async (tx) => {
+            await tx.insert(redirectClicks).values({
+              slug: 'alamo',
+              clickedAt: now(),
+              country: `WU-REDIRECT-${run}`,
+              isBot: true,
+              userAgent: `diag2-WU-${run}`,
+            });
           });
-        });
-      }).catch((error) => console.error('diag2 waitUntil failed:', error))
-    );
+        }).catch((error) => console.error('diag2 waitUntil failed:', error))
+      );
+    } catch (error) {
+      res.wuRegisterErr = error instanceof Error ? error.message : String(error);
+    }
     after(() => {
       withDb(async (db) => {
         await db.transaction(async (tx) => {
@@ -138,6 +143,47 @@ export async function GET(request: Request) {
       }).catch((error) => console.error('diag2 WU-AFTER failed:', error));
     });
   }
+
+  // D1 — recordClick's exact insert (all event columns) awaited, no swallow.
+  try {
+    await withDb(async (db) => {
+      await db.transaction(async (tx) => {
+        await tx.insert(redirectClicks).values({
+          slug: 'alamo',
+          clickedAt: new Date(),
+          ipHash: 'hash-' + run,
+          country: `D1-SYNC-${run}`,
+          city: 'Paris',
+          deviceType: 'desktop',
+          browser: 'Chrome',
+          os: 'Windows',
+          referrer: '/fr/articles/voiture-location',
+          locale: 'fr',
+          isBot: true,
+          userAgent: `diag2-D1-${run}`,
+        });
+      });
+    });
+    res.d1SyncOk = true;
+  } catch (error) {
+    res.d1SyncErr = error instanceof Error ? error.message : String(error);
+  }
+
+  // D2 — the REAL repo recordClick inside after() (fire-and-forget, like /go).
+  after(() => {
+    void recordClick('alamo', {
+      ipHash: `ip-${run}`,
+      country: `D2-AFTER-${run}`,
+      city: 'Paris',
+      deviceType: 'desktop',
+      browser: 'Chrome',
+      os: 'Windows',
+      referrer: '/fr/articles/voiture-location',
+      locale: 'fr',
+      isBot: true, // bot event → click_count never touched
+      userAgent: `diag2-D2-${run}`,
+    }).catch((error) => console.error('diag2 D2 recordClick rejected:', error));
+  });
 
   if (mode === 'redirect') {
     return NextResponse.redirect('https://example.com/', 302);
