@@ -105,6 +105,15 @@ export function hashIp(rawIp: string | null | undefined): string | null {
 
 /** First client IP from the standard proxy chain headers. */
 export function extractIp(request: Request): string | null {
+  // Vercel documents x-vercel-forwarded-for as the original client IP before
+  // its fleet proxies — prefer it when present (x-forwarded-for on the edge
+  // can reflect internal hops). Same rule as x-forwarded-for: leftmost hop
+  // is the client.
+  const vercelForwarded = request.headers.get('x-vercel-forwarded-for');
+  if (vercelForwarded) {
+    const first = vercelForwarded.split(',')[0]?.trim();
+    if (first) return first;
+  }
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
     const first = forwarded.split(',')[0]?.trim();
@@ -137,13 +146,18 @@ export function normalizeReferrer(
 
 /**
  * Determine the site locale at click time:
- *  1. referrer path prefix (/ar/... → ar)
- *  2. NEXT_LOCALE cookie (set by next-intl when the user switches locale)
+ *  1. explicit `loc` query param on the /go URL (e.g. /go/alamo?loc=fr) —
+ *     the widget always passes the page's locale, so this survives direct
+ *     entry, in-app browsers, or referrer-stripping referrer policies
+ *  2. referrer path prefix (/ar/... → ar)
+ *  3. NEXT_LOCALE cookie (set by next-intl when the user switches locale)
  */
 export function resolveLocale(
   referrer: string | null,
-  cookieHeader: string | null
+  cookieHeader: string | null,
+  localeParam?: string | null
 ): string | null {
+  if (localeParam && SITE_LOCALES.includes(localeParam)) return localeParam;
   if (referrer && referrer.startsWith('/')) {
     const segment = referrer.split('/')[1];
     if (SITE_LOCALES.includes(segment)) return segment;
@@ -200,6 +214,11 @@ export function buildClickEvent(request: Request): ClickEvent {
   const referrer = normalizeReferrer(rawReferrer, requestHost);
   const parsed = parseUserAgent(userAgent);
 
+  // The widget issues cloaked links as /go/<slug>?loc=<pageLocale>, so the
+  // locale travels with the request even when the referrer is lost (direct
+  // entry, in-app browsers, referrer-stripping policies).
+  const localeParam = new URL(request.url).searchParams.get('loc');
+
   return {
     ipHash: hashIp(extractIp(request)),
     country: geoCountry || null,
@@ -208,7 +227,7 @@ export function buildClickEvent(request: Request): ClickEvent {
     browser: parsed.browser,
     os: parsed.os,
     referrer,
-    locale: resolveLocale(referrer, request.headers.get('cookie')),
+    locale: resolveLocale(referrer, request.headers.get('cookie'), localeParam),
     isBot: isBotUa(userAgent),
     userAgent,
   };

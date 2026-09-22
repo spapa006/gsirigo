@@ -8,12 +8,16 @@ export const dynamic = 'force-dynamic';
 /**
  * Internal tracking endpoint — the deterministic write path for /go clicks.
  *
- * /go captures the ClickEvent (server-side header parsing + IP hashing, so
- * raw IPs never leave the /go lambda or reach this route) and POSTs it here
- * as a fire-and-forget keepalive request. The write is AWAITED here — a
- * normal request handler — which is what makes capture reliable (verified:
- * awaited lambda writes land 100%, `after()` background writes were flaky on
- * Vercel for 302 responses).
+ * /go captures the ClickEvent from the REAL visitor request (server-side
+ * header parsing + IP hashing, so raw IPs never leave the /go lambda or reach
+ * this route) and POSTs it here as a fire-and-forget keepalive request. This
+ * endpoint derives NOTHING from its own request headers — geo, user-agent,
+ * referrer and locale all arrive in the JSON body, because on a server-to-
+ * server fetch the headers would reflect Vercel's internal path, not the
+ * visitor. The only header read here is x-track-secret (auth). The write is
+ * AWAITED here — a normal request handler — which is what makes capture
+ * reliable (verified: awaited lambda writes land 100%, `after()` background
+ * writes were flaky on Vercel for 302 responses).
  *
  * Security: in production, requests must carry x-track-secret matching
  * TRACKING_SECRET. Without that env var the endpoint accepts POSTs (dev /

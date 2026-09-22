@@ -39,6 +39,13 @@ export const dynamic = 'force-dynamic';
  * so the retry that lands second is simply ignored — at-most-once per click
  * with two independent delivery paths. Any dispatch failure is logged but
  * never breaks the redirect.
+ *
+ * Client context (geo, device, referrer, locale, user-agent) is captured HERE
+ * from the real visitor request and shipped inside the JSON body — the shared
+ * payload built below is reused by BOTH delivery paths, so the retry can
+ * never drop these fields. /api/track re-derives nothing from its own
+ * headers (the server-to-server fetch would see Vercel's internal path, not
+ * the visitor's).
  */
 export async function GET(
   request: Request,
@@ -66,6 +73,9 @@ export async function GET(
   const eventId = randomUUID();
 
   const secret = process.env.TRACKING_SECRET?.trim();
+  // Single payload reused by BOTH delivery paths — the keepalive primary and
+  // the after() retry can never diverge in shape.
+  const payload = JSON.stringify({ slug, event, eventId });
   const dispatch = () =>
     fetch(`${new URL(request.url).origin}/api/track`, {
       method: 'POST',
@@ -73,7 +83,7 @@ export async function GET(
         'content-type': 'application/json',
         ...(secret ? { 'x-track-secret': secret } : {}),
       },
-      body: JSON.stringify({ slug, event, eventId }),
+      body: payload,
       keepalive: true,
     }).catch((error) => {
       console.error(

@@ -95,7 +95,10 @@ export function CarRentalWidget({
     // Cloaked affiliate link: /go/<slug> tracks the click and 302s to the
     // real Travelpayouts URL (standard way outbound affiliate links are issued).
     if (redirectSlug) {
-      window.open(`/go/${redirectSlug}`, '_blank', 'noopener');
+      // Locale rides along as ?loc= so /go/[slug] records the article's
+      // locale even when the referrer is stripped (direct entry, Safari
+      // noopener quirks, in-app browsers).
+      window.open(`/go/${redirectSlug}?loc=${locale}`, '_blank', 'noopener');
       return;
     }
     // Fallback: deep-open the partner site with attribution params.
